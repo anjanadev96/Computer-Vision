@@ -1,0 +1,3 @@
+img=imread('input/Part_4/p4_board_1_grain.jpg');
+img=
+imshow(img);

@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<!-- saved from url=(0064)https://www.ece.iastate.edu/~sukhoy/2020_Spring_575/HW5/hw5.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+      
+      <meta name="generator" content="AsciiDoc 8.6.9">
+      <title>HCI/CprE/ComS 575: Homework #6</title>
+      <link rel="stylesheet" href="./hw5_files/riak.css" type="text/css">
+   </head>
+
+   <body class="article">
+      <div id="header">
+         <h1>HCI/CprE/ComS 575: Homework #5</h1>
+         <!-- MAKE CHANGES HERE: Student information -->
+         <span id="author">Your Name</span><br>
+         <span id="email" class="monospaced">&lt;
+         <a href="mailto:Your%20Email">Your Email</a>&gt;</span><br>
+         <!-- END CHANGES -->
+      </div>
+
+      <div id="content">
+
+	  <div id="preamble">
+				<div class="sectionbody">
+					<div class="paragraph">
+						<p>
+              The following libraries and references may be useful for solving this homework.
+						</p><ul>
+							<li class="level1">
+								<div class="li"><a href="https://github.com/sukhoy/nanohmm" class="urlextern" title="https://github.com/sukhoy/nanohmm" rel="nofollow"> NanoHMM library</a> (includes both C and Python implementations).</div>
+							</li>
+              <li class="level1">
+                <div class="li">
+                  A tutorial on HMMs:
+                  <a href="https://www.ece.ucsb.edu/Faculty/Rabiner/ece259/Reprints/tutorial%20on%20hmm%20and%20applications.pdf" class="urlextern" title="Tutorial on HMMs" rel="nofollow">
+                  paper</a> and <a href="http://alumni.media.mit.edu/~rahimi/rabiner/rabiner-errata/rabiner-errata.html" class="urlextern" title="errata">errata</a>.
+                </div>
+              </li>
+              <li>
+                <div class="li">
+                  <a href="https://en.wikipedia.org/wiki/Forward%E2%80%93backward_algorithm" class="urlextern" title="Forward-backward algorithm" rel="nofollow">
+                  The Wikipedia article on the Forward-Backward algorithm.
+                </a>
+                </div>
+              </li>
+            </ul>
+					</div>
+				</div>
+		</div>
+		<hr>
+		<br>
+
+	     <!-- PART 1 -->
+       <div class="sect1">
+            <h2 id="_part_1">Part 1: Slow Forward Algorithm</h2>
+            <div class="sectionbody">
+               <div class="paragraph">
+                  <p>Implement the "slow" version of the forward algorithm.
+                    It should run in O(N<sup>T</sup>). It should support at least 4 states and sequences of length at least 5.
+                    This should be your own code, i.e., you are not allowed to use any other libraries or implementations for this part.
+                  </p>
+               </div>
+			   <div class="listingblock">
+                  <div class="title">Source</div>
+                  <div class="content monospaced">
+                     <pre>import itertools
+import numpy as np
+
+
+def forward(M,N,O,A,B,pi):
+    states=[]
+
+    for i in range(M):
+        states.append(i)
+
+    state_permutations=[]
+
+
+    for r in itertools.product(states, repeat=N):
+        state_permutations.append(r)
+
+    state_sequence_prob=[0]*len(state_permutations)
+
+
+    for i in range(len(state_permutations)):
+        state_sequence_prob[i]=pi[state_permutations[i][0]]*B[state_permutations[i][0]][O[0]]
+
+    for i in range(len(state_permutations)):
+        for j in range(1,len(state_permutations[0])):
+            state_sequence_prob[i]*=A[state_permutations[i][j-1]][state_permutations[i][j]]*B[state_permutations[i][j]][O[j]]
+
+    return sum(state_sequence_prob)
+    # return np.log2(sum(state_sequence_prob))
+
+M=3
+N=7
+O=(0,1,0,2,0,1,0)
+
+A = [[0.8, 0.1, 0.1],
+     [0.4, 0.2, 0.4],
+     [0, 0.3, 0.7]]
+B = [[0.66, 0.34, 0],
+     [0, 0, 1],
+     [0.5, 0.4, 0.1]]
+pi = [0.6, 0, 0.4]
+answer=forward(M,N,O,A,B,pi)
+print(answer)</pre>
+                  </div>
+               </div>
+</div>
+</div>
+		<hr>
+		<br>
+
+
+    <!-- PART 2 -->
+         <div class="sect2">
+            <h2 id="_part_2">Part 2: The Forward Algorithm</h2>
+            <div class="sectionbody">
+               <div class="paragraph">
+                  <p>
+                    Implement the Forward algorithm that runs in O(N<sup>2</sup>T).
+                    It should support sequences of length at least 8 with at least 5 states. Because these numbers are relatively
+                    small, your code doesn't have to re-normalize the probabilities at each step of the algorithm.
+                    This should be your own code, i.e., you are not allowed to use any other libraries or implementations for this part.
+                  </p>
+               </div>
+			   <div class="listingblock">
+                  <div class="title">Source</div>
+                  <div class="content monospaced">
+                     <pre>import numpy as np
+
+def forward( M,N,Obs,A,B,pi):
+    states=[]
+    for i in range(M):
+        states.append(i)
+
+    alpha = [{}]
+    for state in states:
+        alpha[0][state] = pi[state] * B[state][Obs[0]]
+    for t in range(1, N):
+        alpha.append({})
+        for state in states:
+            alpha[t][state] = sum((alpha[t -1][state0] * A[state0][state] * B[state][Obs[t]]) for state0 in states)
+    prob = sum((alpha[N-1][s]) for s in states)
+    return alpha,prob
+M=3
+N=7
+Obs=(0,1,0,2,0,1,0)
+
+A = [[0.8, 0.1, 0.1],
+     [0.4, 0.2, 0.4],
+     [0, 0.3, 0.7]]
+B = [[0.66, 0.34, 0],
+     [0, 0, 1],
+     [0.5, 0.4, 0.1]]
+pi = [0.6, 0, 0.4]
+
+alpha,answer=forward(M,N,Obs,A,B,pi)
+for i in range(len(alpha)):
+    print(alpha[i])
+print(answer)</pre>
+                  </div>
+               </div>
+</div>
+</div>
+		<hr>
+		<br>
+
+
+    <!-- PART 3 -->
+    <div class="sect3">
+       <h2 id="_part_3">Part 3: Forward Check</h2>
+       <div class="sectionbody">
+          <div class="paragraph">
+             <p>
+               Check your implementation of the forward algorithm by computing the forward variable alpha for
+               the observation sequence O=(0,1,0,2,0,1,0) given the HMM.
+             </p>
+          </div>
+          <div class="paragraph">
+            <h3 id="_part_3a">Part 3A: Forward Check Using HMM with Two States</h3>
+            <p>The HMM for Part 3A is specified below:
+            </p><pre>A = [[0.66, 0.34],
+     [1, 0]]
+B = [[0.5, 0.25, 0.25],
+     [0.1, 0.1, 0.8]]
+pi = [0.8, 0.2]
+            </pre>
+          </div>
+          <div class="listingblock">
+                   <div class="title">Result</div>
+                   <div class="content monospaced">
+                      <pre>Alpha
+{0: 0.4, 1: 0.020000000000000004}
+{0: 0.07100000000000001, 1: 0.013600000000000001}
+{0: 0.030230000000000003, 1: 0.0024140000000000008}
+{0: 0.00559145, 1: 0.008222560000000002}
+{0: 0.005956458500000001, 1: 0.00019010930000000004}
+{0: 0.0010303429775000003, 1: 0.00020251958900000005}
+{0: 0.00044127297707500016, 1: 3.503166123500001e-05}</pre>
+                   </div>
+                </div>
+          <div class="paragraph">
+            <h3 id="_part_3b">Part 3B: Forward Check Using HMM with Three States</h3>
+            <p>The HMM for Part 3B is specified below:
+            </p><pre>A = [[0.8, 0.1, 0.1],
+     [0.4, 0.2, 0.4],
+     [0, 0.3, 0.7]]
+B = [[0.66, 0.34, 0],
+     [0, 0, 1],
+     [0.5, 0.4, 0.1]]
+pi = [0.6, 0, 0.4]
+            </pre>
+          </div>
+    <div class="listingblock">
+             <div class="title">Result</div>
+             <div class="content monospaced">
+                <pre>Alpha
+{0: 0.396, 1: 0, 2: 0.2}
+{0: 0.10771200000000002, 1: 0.0, 2: 0.07184}
+{0: 0.05687193600000001, 1: 0.0, 2: 0.0305296}
+{0: 0.0, 1: 0.0148460736, 2: 0.0027057913600000002}
+{0: 0.003919363430400001, 1: 0.0, 2: 0.003916241696}
+{0: 0.0010660668530688003, 1: 0.0, 2: 0.0012533222120960001}
+{0: 0.0005628832984203267, 1: 0.0, 2: 0.00049196611688704}</pre>
+             </div>
+          </div>
+</div>
+</div>
+<hr>
+<br>
+
+<!-- PART 4 -->
+<div class="sect4">
+   <h2 id="_part_4">Part 4: Likelihood Calculation</h2>
+   <div class="sectionbody">
+      <div class="paragraph">
+         <p>Compute the likelihood for each of the following five observation sequences given the same HMM model:
+</p><pre>O1 = (1,0,0,0,1,0,1)
+O2 = (0,0,0,1,1,2,0)
+O3 = (1,1,0,1,0,1,2)
+O4 = (0,1,0,2,0,1,0)
+O5 = (2,2,0,1,1,0,1)
+</pre><p></p>
+<p>The HMM for Part 6 is specified below:
+</p><pre>A = [[0.6, 0.4],
+     [1, 0]]
+B = [[0.7, 0.3, 0],
+     [0.1, 0.1, 0.8]]
+pi = [0.7, 0.3]
+</pre><p></p>
+<div class="paragraph"><p>
+Hint: Compute this by adding the elements in the last column of the alpha array that is computed by your Forward algorithm.
+</p></div></div>
+<div class="listingblock">
+         <div class="title">Result</div>
+         <div class="content monospaced">
+            <pre>Likelihood for 00 is: 0.0006833869593599999
+Likelihood for 01 is: 0.0011935666175999994
+Likelihood for 02 is: 0.00018577575936
+Likelihood for 03 is: 0.001353738444799999
+Likelihood for 04 is: 0.0
+  </pre>
+         </div>
+      </div>
+</div>
+</div>
+<hr>
+<br>
+
+<!-- PART 5 -->
+<div class="sect5">
+   <h2 id="_part_5">Part 5: Match Sequences to HMMs</h2>
+   <div class="sectionbody">
+      <div class="paragraph">
+         <p>Use your implementation of the Forward algorithm to compute the
+            likelihood for each of the following five observation sequences given each
+            of the following five HMMs. Fill the table below and indicate with *
+            the most probable HMM for each sequence.
+          </p>
+        <p>The observation sequences are:
+</p><pre>O1 = (1,0,0,0,1,0,1)
+O2 = (0,0,0,1,1,2,0)
+O3 = (1,1,0,1,0,1,2)
+O4 = (0,1,0,2,0,1,0)
+O5 = (2,2,0,1,1,0,1)
+</pre><p></p>
+<p>The HMMs are:
+</p><pre>HMM 1:
+A =  [[1.0, 0.0], [0.5, 0.5]]
+B =  [[0.4, 0.6, 0.0], [0.0, 0.0, 1.0]]
+pi =  [0.0, 1.0]
+
+HMM 2:
+A =  [[0.25, 0.75], [1.0, 0.0]]
+B =  [[0, 1.0, 0], [0.66, 0.0, 0.34]]
+pi =  [1.0, 0.0]
+
+HMM 3:
+A =  [[0.0, 1.0], [1.0, 0.0]]
+B =  [[1.0, 0.0, 0.0], [0.0, 0.66, 0.34]]
+pi =  [1.0, 0.0]
+
+HMM 4:
+A =  [[1, 0], [0.44, 0.56]]
+B =  [[0.36, 0.42, 0.22], [1.0, 0, 0]]
+pi =  [0, 1.0]
+
+HMM 5:
+A =  [[0.0, 1.0], [1.0, 0.0]]
+B =  [[0.25, 0.75, 0.0], [1.0, 0.0, 0.0]]
+pi =  [1.0, 0.0]
+</pre>
+<p></p>
+      </div>
+<div class="listingblock">
+         <div class="title">Result</div>
+         <div class="content monospaced">
+            <pre>
+                HMM1          HMM2            HMM3        HMM4                    HMM5
+O1              0.0           0.0             0.0         0.0                     0.10546875*
+O2              0.0           0.0             0.0         0.00396370630656*       0.0
+O3              0.0           0.01562034375*  0.0         0.0                     0.0
+O4              0.0           0.0             0.148104*   0.0007966754611199998   0.0
+O5              0.00864*      0.0             0.0         0.0                     0.0
+  </pre>
+         </div>
+      </div>
+<div class="listingblock">
+       <div class="title">Code</div>
+           <div class="content monospaced">
+    <pre>import numpy as np
+
+def forward( M,N,Obs,A,B,pi):
+    states=[]
+    for i in range(M):
+        states.append(i)
+
+    alpha = [{}]
+    for state in states:
+        alpha[0][state] = pi[state] * B[state][Obs[0]]
+    for t in range(1, N):
+        alpha.append({})
+        for state in states:
+            alpha[t][state] = sum((alpha[t -1][state0] * A[state0][state] * B[state][Obs[t]]) for state0 in states)
+    prob = sum((alpha[N-1][s]) for s in states)
+    return alpha,prob
+
+M=2
+N=7
+
+Obss=[[1,0,0,0,1,0,1],[0,0,0,1,1,2,0],[1,1,0,1,0,1,2],[0,1,0,2,0,1,0],[2,2,0,1,1,0,1]]
+#
+Hmms=[
+    [
+        [[1.0, 0.0], [0.5, 0.5]],
+        [[0.4, 0.6, 0.0], [0.0, 0.0, 1.0]],
+        [0.0, 1.0]
+    ],
+    [[[0.25, 0.75], [1.0, 0.0]],[[0, 1.0, 0], [0.66, 0.0, 0.34]],[1.0, 0.0]],
+[[[0.0, 1.0], [1.0, 0.0]],[[1.0, 0.0, 0.0],[0.0, 0.66, 0.34]],[1.0, 0.0]],
+[[[1, 0], [0.44, 0.56]],[[0.36, 0.42, 0.22], [1.0, 0, 0]],[0, 1.0]],
+[[[0.0, 1.0], [1.0, 0.0]],[[0.25, 0.75, 0.0], [1.0, 0.0, 0.0]],[1.0, 0.0]]]
+
+# Obs=(1,0,0,0,1,0,1)
+# A = [[0.6, 0.4],
+#      [1, 0]]
+# B = [[0.7, 0.3, 0],
+#      [0.1, 0.1, 0.8]]
+# pi = [0.7, 0.3]
+
+
+#
+# alpha,answer=forward(M,N,Obs,A,B,pi)
+# print("Alpha")
+# for i in range(len(alpha)):
+#     print(alpha[i])
+#
+# print(answer)
+
+ans=[[0]*len(Obss) for i in range(len(Hmms))]
+answer=0
+
+# for j in range(len(Obss)):
+#     Obs=Obss[j]
+#     alpha,ans=forward(M,N,Obs,A,B,pi)
+#     print("Likelihood for 0"+str(j),"is:", ans)
+
+
+
+for j in range(len(Obss)):
+    for i in range(len(Hmms)):
+        Obs = Obss[j]
+        Hmm=Hmms[i]
+        alpha,ans[j][i]=forward(M,N,Obs,Hmm[0],Hmm[1],Hmm[2])
+
+        # ans[j][i]=answer
+
+#
+for i in range(len(ans)):
+    print(ans[i])
+</pre>
+    </div>
+    </div>
+    </div>
+  </div>
+<hr>
+<br>
+
+
+<!-- PART 6 -->
+<div class="sect6">
+   <h2 id="_part_7">Part 6: Match Sequences to HMMs (using <a href="https://github.com/sukhoy/nanohmm" class="urlextern" title="https://github.com/sukhoy/nanohmm" rel="nofollow">NanoHMM</a>)</h2>
+   <div class="sectionbody">
+      <div class="paragraph">
+         <p>
+           This problem is similar to Part 8, but the sequences are now longer and
+           your Forward and Backward algorithms may no longer work because they
+           don't perform renormalization at each step.</p>
+        <p>
+           Use the implementation of the Forward algorithm in the <a href="https://github.com/sukhoy/nanohmm" class="urlextern" title="https://github.com/sukhoy/nanohmm" rel="nofollow">NanoHMM</a> library
+           to compute the log-likelihood for each of the following five observation
+           sequences given each of the following five HMMs. Fill the table below
+           and indicate with * the most likely HMM for each sequence. In all cases,
+           N=5, M=6, and T=20.
+</p><pre>O1 = (4,2,5,1,5,1,5,3,2,3,2,0,1,0,0,4,4,3,0,1)
+O2 = (3,2,3,3,5,5,5,5,1,0,1,4,2,4,3,0,5,3,1,0)
+O3 = (4,3,0,3,4,0,1,0,2,0,5,3,2,0,0,5,5,3,5,4)
+O4 = (3,4,2,0,5,4,4,3,1,5,3,3,2,3,0,4,2,5,2,4)
+O5 = (2,0,5,4,4,2,0,5,5,4,4,2,0,5,4,4,5,5,5,5)
+</pre><p></p><p>The HMMs are:
+</p><pre>HMM 1:
+A =  [[0.33, 0, 0, 0.67, 0],
+      [0.67, 0, 0.33, 0, 0],
+      [0, 1.0, 0.0, 0, 0],
+      [0, 0, 0, 0.25, 0.75],
+      [0.0, 0.0, 0.6, 0, 0.4]]
+B =  [[0.67, 0, 0, 0, 0, 0.33],
+      [0.0, 1.0, 0, 0, 0, 0],
+      [0.5, 0, 0, 0, 0, 0.5],
+      [0, 0, 0, 0.25, 0.75, 0],
+      [0, 0.0, 0.6, 0.4, 0, 0.0]]
+pi =  [0.0, 0.0, 0.0, 1.0, 0.0]
+
+
+HMM 2:
+A =  [[0.0, 0.0, 1.0, 0, 0.0],
+      [0.0, 0, 0.0, 0.0, 1.0],
+      [0.38, 0.0, 0.23, 0.38, 0.0],
+      [0.0, 0.31, 0.0, 0.69, 0],
+      [0.0, 0.75, 0.0, 0.25, 0.0]]
+B =  [[0.0, 0.0, 1.0, 0.0, 0.0, 0.0],
+      [0.0, 0.6, 0.2, 0.2, 0.0, 0.0],
+      [0.0, 0.0, 0, 1.0, 0.0, 0],
+      [0, 0.0, 0, 0.22, 0.0, 0.78],
+      [0.6, 0.0, 0.0, 0.0, 0.4, 0.0]]
+pi =  [0.0, 0.0, 1.0, 0.0, 0.0]
+
+HMM 3:
+A =  [[0, 0.0, 0.32, 0.18, 0.5],
+      [0.0, 0.0, 0.0, 1.0, 0.0],
+      [0, 0.0, 0, 0.0, 1.0],
+      [0, 0.64, 0, 0.0, 0.36],
+      [1.0, 0.0, 0, 0, 0]]
+B =  [[0.0, 0.17, 0.33, 0.0, 0.0, 0.5],
+      [0.0, 0.0, 0.0, 1.0, 0.0, 0.0],
+      [0.47, 0.0, 0.0, 0.0, 0.0, 0.53],
+      [0.27, 0.0, 0.0, 0.0, 0.73, 0.0],
+      [0.66, 0.0, 0.0, 0.33, 0.0, 0.0]]
+pi =  [0.0, 0.0, 0.0, 1.0, 0.0]
+
+HMM 4:
+A =  [[0.0, 0.0, 1.0, 0, 0.0],
+      [0.0, 0, 0.62, 0, 0.38],
+      [0.0, 0.5, 0.0, 0.5, 0.0],
+      [0.0, 0.23, 0.0, 0.0, 0.77],
+      [0.0, 0, 0, 1.0, 0]]
+B =  [[0.0, 0.0, 0.0, 1.0, 0.0, 0.0],
+      [0.0, 0.0, 0.62, 0, 0.38, 0.0],
+      [0, 0.0, 0.0, 0.0, 1, 0],
+      [0, 0.0, 0, 0.41, 0.18, 0.41],
+      [0.31, 0.16, 0.37, 0.16, 0, 0.0]]
+pi =  [1.0, 0.0, 0.0, 0.0, 0]
+
+HMM 5:
+A =  [[0.5, 0.33, 0, 0.17, 0.0],
+      [0.0, 0.0, 0.0, 0.0, 1.0],
+      [0.75, 0.0, 0.25, 0.0, 0.0],
+      [0.0, 0.0, 0, 1.0, 0.0],
+      [0.0, 0.0, 1.0, 0.0, 0.0]]
+B =  [[0.0, 0.0, 0.0, 0.0, 1.0, 0],
+      [0.0, 0.0, 1.0, 0.0, 0.0, 0.0],
+      [0.0, 0.0, 0.0, 0.0, 0, 1.0],
+      [0.0, 0.0, 0.0, 0.0, 0, 1.0],
+      [1.0, 0.0, 0.0, 0.0, 0.0, 0.0]]
+pi =  [0.0, 1.0, 0.0, 0.0, 0.0]
+</pre>
+<p></p>
+      </div>
+<div class="listingblock">
+         <div class="title">Result</div>
+         <div class="content monospaced">
+            <pre>
+                HMM1             HMM2                  HMM3                   HMM4                      HMM5
+O1          -28.46471914737028*  -inf                   -inf                   -inf                    -inf
+O2          -inf                 -28.632927903652742*   -inf                   -inf                    -inf
+O3          -inf                 -inf                   -30.97288040871276*    -inf                    -inf
+O4          -inf                 -inf                   -inf                   -34.74407171447881*     -inf
+O5          -inf                 -inf                   -inf                   -inf                 -12.00042998719346*
+            </pre>
+         </div>
+      </div>
+      <div class="listingblock">
+             <div class="title">Code</div>
+                 <div class="content monospaced">
+          <pre>import nanohmm
+
+Obss= [[4,2,5,1,5,1,5,3,2,3,2,0,1,0,0,4,4,3,0,1],
+       [3,2,3,3,5,5,5,5,1,0,1,4,2,4,3,0,5,3,1,0],
+       [4,3,0,3,4,0,1,0,2,0,5,3,2,0,0,5,5,3,5,4],
+       [3,4,2,0,5,4,4,3,1,5,3,3,2,3,0,4,2,5,2,4],
+       [2,0,5,4,4,2,0,5,5,4,4,2,0,5,4,4,5,5,5,5]]
+
+Hmms=[
+[
+[[0.33, 0, 0, 0.67, 0],
+      [0.67, 0, 0.33, 0, 0],
+      [0, 1.0, 0.0, 0, 0],
+      [0, 0, 0, 0.25, 0.75],
+      [0.0, 0.0, 0.6, 0, 0.4]],
+[[0.67, 0, 0, 0, 0, 0.33],
+      [0.0, 1.0, 0, 0, 0, 0],
+      [0.5, 0, 0, 0, 0, 0.5],
+      [0, 0, 0, 0.25, 0.75, 0],
+      [0, 0.0, 0.6, 0.4, 0, 0.0]],
+[0.0, 0.0, 0.0, 1.0, 0.0]
+],
+
+[
+[[0.0, 0.0, 1.0, 0, 0.0],
+      [0.0, 0, 0.0, 0.0, 1.0],
+      [0.38, 0.0, 0.23, 0.38, 0.0],
+      [0.0, 0.31, 0.0, 0.69, 0],
+      [0.0, 0.75, 0.0, 0.25, 0.0]],
+[[0.0, 0.0, 1.0, 0.0, 0.0, 0.0],
+      [0.0, 0.6, 0.2, 0.2, 0.0, 0.0],
+      [0.0, 0.0, 0, 1.0, 0.0, 0],
+      [0, 0.0, 0, 0.22, 0.0, 0.78],
+      [0.6, 0.0, 0.0, 0.0, 0.4, 0.0]],
+[0.0, 0.0, 1.0, 0.0, 0.0]
+],
+
+[
+[[0, 0.0, 0.32, 0.18, 0.5],
+      [0.0, 0.0, 0.0, 1.0, 0.0],
+      [0, 0.0, 0, 0.0, 1.0],
+      [0, 0.64, 0, 0.0, 0.36],
+      [1.0, 0.0, 0, 0, 0]],
+[[0.0, 0.17, 0.33, 0.0, 0.0, 0.5],
+      [0.0, 0.0, 0.0, 1.0, 0.0, 0.0],
+      [0.47, 0.0, 0.0, 0.0, 0.0, 0.53],
+      [0.27, 0.0, 0.0, 0.0, 0.73, 0.0],
+      [0.66, 0.0, 0.0, 0.33, 0.0, 0.0]],
+[0.0, 0.0, 0.0, 1.0, 0.0]
+],
+
+[
+[[0.0, 0.0, 1.0, 0, 0.0],
+      [0.0, 0, 0.62, 0, 0.38],
+      [0.0, 0.5, 0.0, 0.5, 0.0],
+      [0.0, 0.23, 0.0, 0.0, 0.77],
+      [0.0, 0, 0, 1.0, 0]],
+[[0.0, 0.0, 0.0, 1.0, 0.0, 0.0],
+      [0.0, 0.0, 0.62, 0, 0.38, 0.0],
+      [0, 0.0, 0.0, 0.0, 1, 0],
+      [0, 0.0, 0, 0.41, 0.18, 0.41],
+      [0.31, 0.16, 0.37, 0.16, 0, 0.0]],
+[1.0, 0.0, 0.0, 0.0, 0]
+],
+
+[
+[[0.5, 0.33, 0, 0.17, 0.0],
+      [0.0, 0.0, 0.0, 0.0, 1.0],
+      [0.75, 0.0, 0.25, 0.0, 0.0],
+      [0.0, 0.0, 0, 1.0, 0.0],
+      [0.0, 0.0, 1.0, 0.0, 0.0]],
+[[0.0, 0.0, 0.0, 0.0, 1.0, 0],
+      [0.0, 0.0, 1.0, 0.0, 0.0, 0.0],
+      [0.0, 0.0, 0.0, 0.0, 0, 1.0],
+      [0.0, 0.0, 0.0, 0.0, 0, 1.0],
+      [1.0, 0.0, 0.0, 0.0, 0.0, 0.0]],
+[0.0, 1.0, 0.0, 0.0, 0.0]
+]
+
+]
+
+ans=[[0]*len(Obss) for i in range(len(Hmms))]
+answer=0
+
+for j in range(len(Obss)):
+    for i in range(len(Hmms)):
+        Obs = Obss[j]
+        Hmm=Hmms[i]
+        lambda_ = nanohmm.hmm_t(Hmm[0], Hmm[1], Hmm[2])
+        f = nanohmm.forward_t(lambda_)
+        LL = nanohmm.forward(f, Obs)
+        ans[j][i]=LL
+
+for i in range(len(ans)):
+    print(ans[i])
+
+      </pre>
+          </div>
+          </div>
+</div>
+</div>
+<hr>
+<br>
+
+<!-- PART 7 -->
+<div class="sect7">
+   <h2 id="_part_7">Part 7: Train HMMs (using the <a href="https://github.com/sukhoy/nanohmm" class="urlextern" title="https://github.com/sukhoy/nanohmm" rel="nofollow">NanoHMM</a> library)</h2>
+   <div class="sectionbody">
+      <div class="paragraph">
+        <p>The following five observation sequences are used for both parts 10A and 10B:
+</p><pre>O1 = (4,2,5,1,5,1,5,3,2,3,2,0,1,0,0,4,4,3,0,1)
+O2 = (3,2,3,3,5,5,5,5,1,0,1,4,2,4,3,0,5,3,1,0)
+O3 = (4,3,0,3,4,0,1,0,2,0,5,3,2,0,0,5,5,3,5,4)
+O4 = (3,4,2,0,5,4,4,3,1,5,3,3,2,3,0,4,2,5,2,4)
+O5 = (2,0,5,4,4,2,0,5,5,4,4,2,0,5,4,4,5,5,5,5)
+</pre>
+         <p></p>
+      </div>
+  <h3 id="_part_8a">Part 7A: Train 3-State HMMs</h3>
+  <p>
+    Train a 3-state HMM for each of the five observation sequences using the Baum-Welch
+    implementation in the <a href="https://github.com/sukhoy/nanohmm" class="urlextern" title="https://github.com/sukhoy/nanohmm" rel="nofollow">NanoHMM</a> library.</p>
+<div class="listingblock">
+         <div class="title">Result</div>
+         <div class="content monospaced">
+            <pre>LL = -41.96726416039205
+Trained HMM for O1
+A =  [[2.4564041499690674e-51, 1.0, 5.078422770588239e-46], [0.8541696835876277, 5.2182084229336704e-14, 0.14583031641232003], [0.40072129692242775, 2.1953047867132345e-96, 0.5992787030775723]]
+B =  [[8.161481082873718e-203, 0.2505688990000317, 0.24829330299987498, 0.1252844495000233, 6.729029928931497e-151, 0.37585334850007], [0.4270848417938481, 0.28645757910308445, 8.916460685223924e-304, 0.2864575791030674, 0.0, 0.0], [0.2021638907671962, 1.4537670839147735e-48, 0.20216389076723976, 1.4656518368143289e-44, 0.5956722184655641, 0.0]]
+pi =  [0.0, 0.0, 1.0]
+LL = -43.654322342792554
+Trained HMM for O2
+A =  [[0.6485322541269856, 0.35146774587301455, 0.0], [0.1673883563542411, 0.5154640059812251, 0.3171476376645338], [0.5, 1.4431747167893585e-112, 0.5]]
+B =  [[1.1515379632475015e-144, 4.250971272426389e-21, 1.8984442916995775e-88, 0.42487675479798254, 4.153511709033912e-192, 0.5751232452020175], [0.41060953455368343, 0.41060953455368343, 0.0, 0.17878093089263317, 0.0, 0.0], [4.7798532558576945e-58, 3.12084568312319e-44, 0.5, 7.125178577867581e-80, 0.5, 0.0]]
+pi =  [0.0, 1.0, 0.0]
+LL = -42.59660368528863
+Trained HMM for O3
+A =  [[0.2824943386368717, 0.7175056613631283, 0.0], [0.8149934962563364, 0.18500650374366368, 0.0], [1.0, 5.976391886034007e-55, 0.0]]
+B =  [[9.479886858233656e-80, 0.09458480543692557, 0.18916961087385115, 0.14873675106766995, 0.18916961087385115, 0.3783392217477023], [0.7119568249389602, 1.8742858269217258e-144, 0.0, 0.2880431750610398, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 1.0, 0.0]]
+pi =  [1e-323, 0.0, 1.0]
+LL = -46.84529712744331
+Trained HMM for O4
+A =  [[0.6672718783424642, 0.33272812165753585, 0.0], [0.7152474629047576, 0.2847525370952424, 0.0], [1.0, 5.976391886034007e-55, 0.0]]
+B =  [[2.462581210894491e-75, 0.07684413961267193, 0.3073765584506877, 0.0010261850352649622, 0.38422069806335957, 0.23053241883801576], [0.2862603932233954, 1.028256501788397e-154, 0.0, 0.7137396067766045, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 1.0, 0.0]]
+pi =  [0.0, 1.0, 0.0]
+LL = -36.361601956767686
+Trained HMM for O5
+A =  [[0.8125, 0.1875, 0.0], [1.0, 0.0, 0.0], [1.0, 5.976391886034007e-55, 0.0]]
+B =  [[9.813494850802173e-96, 0.0, 0.17647058823529413, 0.0, 0.35294117647058826, 0.47058823529411764], [1.0, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 1.0, 0.0]]
+pi =  [1.0, 0.0, 0.0]
+  </pre>
+         </div>
+      </div>
+          <h3 id="_part_8b">Part 7B: Train 4-State HMMs</h3>
+          <p>
+            Train a 4-state HMM for each of the five observation sequences using the Baum-Welch
+            implementation in the <a href="https://github.com/sukhoy/nanohmm" class="urlextern" title="https://github.com/sukhoy/nanohmm" rel="nofollow">NanoHMM</a> library.</p>
+        <div class="listingblock">
+                 <div class="title">Result</div>
+                 <div class="content monospaced">
+                    <pre>LL = -31.70950594454668
+Trained HMM for O1
+A =  [[0.19999999999999998, 0.0, 3.124009260955728e-92, 0.8], [0.24999999999999994, 3.7267015180839864e-63, 0.7500000000000001, 0.0], [0.16666666666666669, 0.8333333333333334, 5.975496437175312e-45, 0.0], [0.25000000000000006, 0.0, 0.75, 0.0]]
+B =  [[4.597300512542951e-73, 8.594773166599584e-122, 4.176765938767116e-108, 0.4, 0.6, 8.947222389086885e-67], [0.19999999999999998, 0.8, 0.0, 0.0, 0.0, 0.0], [0.5, 0.0, 0.0, 0.0, 1.7002938134602807e-31, 0.5000000000000001], [0.0, 0.0, 0.75, 0.24999999999999994, 0.0, 0.0]]
+pi =  [1.0, 0.0, 0.0, 0.0]
+LL = -43.93176853813128
+Trained HMM for O2
+A =  [[0.35553159803906104, 0.0, 8.548312107658633e-07, 0.6444675471297283], [0.5038921649680072, 0.0, 0.49610783503199285, 0.0], [0.15292526398104475, 0.2695629909841299, 0.5775117450348254, 0.0], [0.5000003123130247, 0.0, 0.4999996876869754, 0.0]]
+B =  [[0.14899144581220009, 0.157206528021607, 8.211631104003056e-175, 0.41628128998056646, 0.27752073618460515, 1.0212613541766159e-12], [0.0, 1.0, 0.0, 0.0, 0.0, 0.0], [0.2781105220092167, 0.0, 0.0, 0.0, 0.0, 0.7218894779907834], [0.0, 0.0, 0.5000001672881488, 0.49999983271185117, 0.0, 0.0]]
+pi =  [1.0, 0.0, 0.0, 0.0]
+LL = -41.96424788404204
+Trained HMM for O3
+A =  [[0.3081191245846076, 0.0, 0.19018162460249727, 0.5016992508128951], [1.0, 0.0, 0.0, 0.0], [0.6009890961311678, 0.1455773344593948, 0.25343356940943745, 0.0], [1.0438137346695894e-59, 0.0, 1.0, 0.0]]
+B =  [[0.1494651676318335, 5.761873875811295e-81, 9.200648527989933e-290, 0.27119593204828835, 0.35662762289314587, 0.22271127742673236], [0.0, 1.0, 0.0, 0.0, 0.0, 0.0], [0.6904265247869333, 0.0, 0.0, 0.0, 0.0, 0.3095734752130667], [0.0, 0.0, 0.5378277104604555, 0.4621722895395444, 0.0, 0.0]]
+pi =  [1.0, 0.0, 0.0, 0.0]
+LL = -44.679629291440094
+Trained HMM for O4
+A =  [[0.6153846153846154, 0.0, 0.07692307692307693, 0.3076923076923077], [1.0, 0.0, 0.0, 0.0], [1.0, 0.0, 0.0, 0.0], [0.75, 0.0, 0.25, 0.0]]
+B =  [[1.326113259675106e-33, 0.07142857142857142, 1.4580498358599947e-212, 0.35714285714285715, 0.35714285714285715, 0.21428571428571427], [0.0, 1.0, 0.0, 0.0, 0.0, 0.0], [1.0, 0.0, 0.0, 0.0, 0.0, 1.626362665914017e-31], [0.0, 0.0, 1.0, 5.280001008901971e-66, 0.0, 0.0]]
+pi =  [1.0, 0.0, 0.0, 0.0]
+LL = -21.845162435303454
+Trained HMM for O5
+A =  [[0.8461538461538461, 0.0, 0.0, 0.15384615384615385], [1.0, 0.0, 0.0, 0.0], [1.0, 0.0, 0.0, 0.0], [0.0, 0.0, 1.0, 0.0]]
+B =  [[0.0, 0.0, 0.0, 0.0, 0.42857142857142855, 0.5714285714285714], [0.0, 1.0, 0.0, 0.0, 0.0, 0.0], [1.0, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 1.0, 0.0, 0.0, 0.0]]
+pi =  [0.0, 0.0, 0.0, 1.0]
+</pre>
+                 </div>
+              </div>
+              <div class="listingblock">
+                     <div class="title">Code</div>
+                         <div class="content monospaced">
+                  <pre>import numpy as np
+import random
+import nanohmm
+
+#Enter the size of the A,B, pi matrices as input parameters
+def randomize(m,n):
+      A=[]
+      for i in range(m):
+          a= [ random.random() for i in range(n)]
+          s=sum(a)
+          a= [ i/s for i in a]
+          A.append(a)
+      return A
+
+A=randomize(3,3)
+B=randomize(3,6)
+pi=randomize(1,3)[0]
+
+
+Observation_sequences=[
+(4,2,5,1,5,1,5,3,2,3,2,0,1,0,0,4,4,3,0,1),
+(3,2,3,3,5,5,5,5,1,0,1,4,2,4,3,0,5,3,1,0),
+(4,3,0,3,4,0,1,0,2,0,5,3,2,0,0,5,5,3,5,4),
+(3,4,2,0,5,4,4,3,1,5,3,3,2,3,0,4,2,5,2,4),
+(2,0,5,4,4,2,0,5,5,4,4,2,0,5,4,4,5,5,5,5)]
+
+def Baum_Welch(A,B,pi,Observation_sequences):
+      for j in range(len(Observation_sequences)):
+            O=Observation_sequences[j]
+            lambda_ = nanohmm.hmm_t(A, B, pi)
+            bw = nanohmm.baumwelch_t(lambda_)
+            LL, lambda_ = nanohmm.baumwelch(bw, O, 100)
+            print("LL =", LL)
+            print("Trained HMM:")
+            print("A = ", lambda_.A)
+            print("B = ", lambda_.B)
+            print("pi = ", lambda_.pi) </pre>
+                  </div>
+                  </div>
+        </div>
+  </div>
+<hr>
+<br>
+        <h1 id="_ec">Extra Credit</h1>
+        <div class="sectionbody">
+           <div class="paragraph">
+              <p>For each of the three problems below, you are allowed to use only
+                your own code. In other words, you are not allowed to use any other
+                 libraries or implementations for these problems.
+              </p>
+           </div>
+         </div>
+	     <!-- PART EC1 -->
+         <div class="sectEC1">
+            <h2 id="_part_ec1">Part EC1: Implement the Forward Algorithm with Re-Normalization</h2>
+             <div class="listingblock">
+                <div class="title">Source</div>
+                <div class="content monospaced">
+                  <pre>import numpy as np
+
+def forward_normalization(A, B, pi, M, N, Obs):
+    T = len(Obs)  #Length of Observation Sequence
+    alpha = [[0] * T for _ in range(N)]
+    sum = [0] * T
+    logL = 0
+    for t in range(T):
+        sum[t] = 0
+        for i in range(N):
+            if t == 0:
+                alpha[i][0] = pi[i] * B[i][Obs[0]]
+            else:
+                alpha[i][t] = 0
+                for j in range(N):
+                    alpha[i][t] += alpha[j][t - 1] * A[j][i] * B[i][Obs[t]]
+            sum[t] += alpha[i][t]
+        if sum[t] == 0 or float('inf') == 1.0 / sum[t]:
+            sum[t] = 1.0
+            logL = -float('inf')
+        else:
+            sum[t] = 1.0 / sum[t]
+            for i in range(N):
+                alpha[i][t] *= sum[t]
+        logL -= np.log2(sum[t])
+
+    return logL,sum
+
+
+M = 3 #Range of values in the Observation Sequence
+N = 2 #Number of States
+Obs = [0, 1, 0, 2, 0, 1, 0]
+
+A = [[0.66, 0.34],
+     [1, 0]]
+B = [[0.5, 0.25, 0.25],
+     [0.1, 0.1, 0.8]]
+pi = [0.8, 0.2]
+x,_ = forward_normalization(A, B, pi, M, N, Obs)
+print("Log Likelihood of Observation Sequence is:",x)
+                 </pre>
+              </div>
+          </div>
+        </div>
+			  <br>
+
+        <!-- PART EC2 -->
+          <div class="sectEC2">
+             <h2 id="_part_ec2">Part EC2: Implement the Forward-Backward Algorithm with Re-Normalization</h2>
+             <div class="listingblock">
+                <div class="title">Source</div>
+                <div class="content monospaced">
+                  <pre>import Part_EC1 as f
+
+def forward_backward_normalization(A,B,pi,M,N,Obs):
+    T = len(Obs)
+    beta = [[None ] *T for _ in range(N)]
+
+    logL, sum = f.forward_normalization(A, B, pi, M, N, Obs)
+
+    for i in range(N):
+        beta[i][T-1] = sum[T-1]
+    for t in range(T-1, 0, -1):
+        for i in range(N):
+            beta[i][t -1] = 0
+            for j in range(N):
+                beta[i][ t -1] += A[i][j] * B[j][Obs[t]] * beta[j][t]
+
+            beta[i][ t -1] *= sum[t -1]
+
+    return logL,beta
+
+M = 3
+N = 2
+Obs = [0, 1, 0, 2, 0, 1, 0]
+
+A = [[0.66, 0.34],
+     [1, 0]]
+B = [[0.5, 0.25, 0.25],
+     [0.1, 0.1, 0.8]]
+pi = [0.8, 0.2]
+
+logL,beta=forward_backward_normalization(A,B,pi,M,N,Obs)
+print("Beta values for the observation sequence are:")
+for i in range(len(beta)):
+    print(beta[i])
+                  </pre>
+              </div>
+          </div>
+        </div>
+ 			  <br>
+
+        <!-- PART EC3 -->
+          <div class="sectEC3">
+             <h2 id="_part_ec3">Part EC3: Implement the Baum-Welch Algorithm</h2>
+             <div class="listingblock">
+                <div class="title">Source</div>
+                <div class="content monospaced">
+                  <pre>// Insert your code here
+                 </pre>
+              </div>
+          </div>
+        </div>
+ 			  <br>
+
+      <div id="footer">
+         <div id="footer-text">
+            Last updated 2020-04-02
+         </div>
+      </div>
+    </div>
+   
+
+</body></html>

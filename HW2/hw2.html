@@ -1,0 +1,3618 @@
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+      <meta name="generator" content="AsciiDoc 8.6.9">
+      <title>HCI/CprE/ComS 575: Homework #2</title>
+      <link rel="stylesheet" href="./riak.css" type="text/css">
+   </head>
+   <body class="article">
+      <div id="header">
+         <h1>HCI/CprE/ComS 575: Homework #2</h1>
+         <!-- MAKE CHANGES HERE: Student information -->
+         <span id="author">Anjana Deva Prasad</span><br>
+         <span id="email" class="monospaced">&lt;
+         <a href="mailto:Your Email">anjana@iastate.edu</a>&gt;</span><br>
+         <!-- END CHANGES -->
+      </div>
+      <div id="content">
+        <p>Supplementary files for this homework are posted on <a href="../../">the
+        class web page</a>.</p>
+         <div class="sect1">
+            <h2 id="_part_1a">Part 1A</h2>
+            <div class="sectionbody">
+               <div class="paragraph">
+                 <p>Write two programs, one with Matlab <strong>and</strong>
+                 another with OpenCV, that identify <strong>each</strong> of the 64 squares on the
+                 chess board and labels them with &apos;a1&apos;, &apos;b1&apos;,
+                 &apos;a2&apos;, ..., &apos;g8&apos; and &apos;h8&apos;.
+                 In each label, the letter indicates the column and the
+                 digit indicates the row, starting from the bottom left corner.
+                 Your programs should place one label in each of the 64 squares.
+                 See this Wikipedia <a
+                 href="https://en.wikipedia.org/wiki/Chess">page</a> for more
+                 information about this labeling system.
+                  </p>
+               </div>
+               <div class="sect2">
+                  <h3 id="_matlab">Matlab</h3>
+                  <table class="tableblock frame-all grid-all" style=" width:100%; ">
+                     <col style="width:50%;">
+                     <col style="width:50%;">
+                     <tbody>
+                        <tr>
+                           <td class="tableblock halign-left valign-top" >
+                              <p class="tableblock"><span class="image">
+                                 <img src="input/Part_1/p1_board.jpg" alt="input/Part_1/p1_board.jpg" width="100%">
+                                 </span>
+                              </p>
+                           </td>
+                           <td class="tableblock halign-left valign-top" >
+                              <p class="tableblock">
+                                 <span class="image">
+                                    <!-- MAKE CHANGES HERE: Part 1 MATLAB Handle -->
+                                    <img src="output/Part_1a/Part_1a.png" alt="Handle" width="100%">
+                                    <!-- END CHANGES -->
+                                 </span>
+                              </p>
+                           </td>
+                        </tr>
+                     </tbody>
+                  </table>
+                  <div class="listingblock">
+                     <div class="title">Source</div>
+                     <div class="content monospaced">
+                        <!-- MAKE CHANGES HERE: Part 1 MATLAB code -->
+                        <pre>
+img=imread('input/Part_1/p1_board.jpg');
+figure;
+imshow(img);
+
+img1=insertlabels(img);
+imwrite(img1,'output/Part_1a/Part_1a.png');
+figure;
+imshow(img1);
+
+
+function [img1]= insertlabels(img)
+str= [];
+position=[];
+for i=8:-1:1
+    for j='a':1:'h'
+        str=[ str, string(j)+string(i)];
+    end
+end
+str=reshape(str,64,1);
+
+for i=1:60:480
+    for j=1:60:480
+        position=[position; [j  i]];
+    end
+end
+position=reshape(position,64,2);
+disp(position)    
+img1= insertText(img,position,str,'BoxColor', 'white','FontSize', 12, 'TextColor', 'black'); 
+figure;
+
+end
+
+
+											</pre>
+                        <!-- END CHANGES -->
+                     </div>
+                  </div>
+               </div>
+               <div class="sect3">
+                  <h3 id="_opencv">OpenCV</h3>
+                  <table class="tableblock frame-all grid-all" style=" width:100%; ">
+                     <col style="width:50%;">
+                     <col style="width:50%;">
+                     <tbody>
+                        <tr>
+                           <td class="tableblock halign-left valign-top" >
+                              <p class="tableblock"><span class="image">
+                                 <img src="input/Part_1/p1_board.jpg" alt="input/Part_1/p1_board.jpg" width="100%">
+                                 </span>
+                              </p>
+                           </td>
+                           <td class="tableblock halign-left valign-top" >
+                              <p class="tableblock">
+                                 <span class="image">
+                                    <!-- MAKE CHANGES HERE: Part 1 OpenCV Handle -->
+                                    <img src="output/Part_1a/Part_1a.png" alt="Handle" width="100%">
+                                    <!-- END CHANGES -->
+                                 </span>
+                              </p>
+                           </td>
+                        </tr>
+                     </tbody>
+                  </table>
+                  <div class="listingblock">
+                     <div class="title">Source</div>
+                     <div class="content monospaced">
+                        <!-- MAKE CHANGES HERE: Part 1a OpenCV code -->
+                        <pre>
+// Insert your code here
+
+
+#include &ltopencv2/opencv.hpp>
+
+#include "opencv2/imgproc.hpp"
+#include &ltiostream>
+
+using namespace cv;
+using namespace std;
+
+int main(int argc, char** argv)
+{
+ // Read the image file
+ Mat image = imread("p1_board.jpg");
+
+char letter='a'; // Starting letter
+char number='8'; // Starting number
+
+for(int i=0; i&ltimage.rows; i+=60)
+
+{char number='8';
+
+for(int j=0; j&ltimage.cols; j+=60)
+{
+string text;
+text.push_back(letter);
+text.push_back(number);
+putText(image, text, Point(i+30,j+30), FONT_HERSHEY_COMPLEX_SMALL, 0.7, Scalar(0,0,0), 1);
+
+number--;}
+
+letter++;}
+
+imwrite( "../../output/Part_1a/Part_1a.png", image);
+ 
+ 
+ String windowName = "1"; //Name of the window
+
+ namedWindow(windowName); // Create a window
+
+ imshow(windowName,image); // Show our image inside the created window.
+
+ waitKey(0); // Wait for any keystroke in the window
+
+ destroyWindow(windowName); //destroy the created window
+
+ return 0;
+}
+
+
+											</pre>
+                        <!-- END CHANGES -->
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+         <div class="sect1">
+            <h2 id="_part_1d">Part 1B</h2>
+            <div class="sectionbody">
+               <div class="paragraph">
+                  <p>Write <strong>two</strong> programs, one with Matlab <strong>and</strong>
+                 another with OpenCV. Each of the two programs should flip the
+                 color of all squares, i.e., black to white, and white to black.
+                  </p>
+               </div>
+               <div class="sect2">
+                  <h3 id="_matlab1d">Matlab</h3>
+                  <table class="tableblock frame-all grid-all" style=" width:100%; ">
+                     <col style="width:50%;">
+                     <col style="width:50%;">
+                     <tbody>
+                     <tr>
+                        <td class="tableblock halign-left valign-top" >
+                           <p class="tableblock"><span class="image">
+                                 <img src="input/Part_1/p1_board.jpg" alt="input/Part_1/p1_board.jpg" width="100%">
+                                 </span>
+                           </p>
+                        </td>
+                        <td class="tableblock halign-left valign-top" >
+                           <p class="tableblock">
+                                 <span class="image">
+                                    <!-- MAKE CHANGES HERE: Part 1 MATLAB Handle -->
+                                    <img src="output/Part_1b/part1b.png" alt="Handle" width="100%">
+                                    <!-- END CHANGES -->
+                                 </span>
+                           </p>
+                        </td>
+                     </tr>
+                     </tbody>
+                  </table>
+                  <div class="listingblock">
+                     <div class="title">Source</div>
+                     <div class="content monospaced">
+                        <!-- MAKE CHANGES HERE: Part 1b MATLAB code -->
+                        <pre>img=imread('p1_board.jpg');
+figure;
+imshow(img);
+img1=400-img;
+
+imwrite(img1,'part1b.png');
+figure;
+imshow(img1);
+
+      
+
+
+
+						
+						</pre>
+                        <!-- END CHANGES -->
+                     </div>
+                  </div>
+               </div>
+               <div class="sect3">
+                  <h3 id="_opencv1d">OpenCV</h3>
+                  <table class="tableblock frame-all grid-all" style=" width:100%; ">
+                     <col style="width:50%;">
+                     <col style="width:50%;">
+                     <tbody>
+                     <tr>
+                        <td class="tableblock halign-left valign-top" >
+                           <p class="tableblock"><span class="image">
+                                 <img src="input/Part_1/p1_board.jpg" alt="input/Part_1/p1_board.jpg" width="100%">
+                                 </span>
+                           </p>
+                        </td>
+                        <td class="tableblock halign-left valign-top" >
+                           <p class="tableblock">
+                                 <span class="image">
+                                    <!-- MAKE CHANGES HERE: Part 1b OpenCV Handle -->
+                                    <img src="output/Part_1b/part_1b_cv.png" alt="Handle" width="100%">
+                                    <!-- END CHANGES -->
+                                 </span>
+                           </p>
+                        </td>
+                     </tr>
+                     </tbody>
+                  </table>
+                  <div class="listingblock">
+                     <div class="title">Source</div>
+                     <div class="content monospaced">
+                        <!-- MAKE CHANGES HERE: Part 1b OpenCV code -->
+                        <pre>
+#include &ltopencv2/opencv.hpp>
+#include &ltiostream>
+
+using namespace cv;
+using namespace std;
+
+int main(int argc, char** argv)
+{
+ // Read the image file
+ Mat image = imread("p1_board.jpg",0);
+
+ // Check for failure
+ if (image.empty()) 
+ {
+  cout &lt&lt "Could not open or find the image" &lt&lt endl;
+  cin.get(); //wait for any key press
+  return -1;
+ }
+
+ String windowName = "1"; //Name of the window
+
+ namedWindow(windowName); // Create a window
+ cout&lt&ltimage.rows;
+ cout&lt&ltimage.cols;
+ image=400-image;
+ imwrite("../../output/Part_1b/part_1b_cv.png",image);
+ imshow(windowName, image); // Show our image inside the created window.
+
+ waitKey(0); // Wait for any keystroke in the window
+
+ destroyWindow(windowName); //destroy the created window
+
+ return 0;
+}
+
+
+
+
+											</pre>
+                        <!-- END CHANGES -->
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+         <div class="sect1">
+            <h2 id="_part_2a">Part 2A</h2>
+            <div class="sectionbody">
+               <div class="paragraph">
+                  <p>Write <strong>two</strong> programs, one with Matlab
+                 <strong>and</strong> another with OpenCV. Each program should find all pawns
+                 in the chessboard images below and highlight them
+                 (e.g., by drawing a bounding box around the pawn with a bright color).
+                  </p>
+               </div>
+               <table class="tableblock frame-all grid-all" style=" width:100%; ">
+                  <col style="width:33%;">
+                  <col style="width:33%;">
+                  <col style="width:33%;">
+                  <tbody>
+                     <tr>
+                        <td class="tableblock halign-left valign-top" >
+                           <p class="tableblock"><span class="image">
+                              <img src="input/Part_2/p2_board_1.jpg" alt="input/Part_2/p2_board_1.jpg" width="100%">
+                              </span>
+                           </p>
+                        </td>
+                        <td class="tableblock halign-left valign-top" >
+                           <p class="tableblock"><span class="image">
+                              <img src="input/Part_2/p2_board_2.jpg" alt="input/Part_2/p2_board_2.jpg" width="100%">
+                              </span>
+                           </p>
+                        </td>
+                        <td class="tableblock halign-left valign-top" >
+                           <p class="tableblock"><span class="image">
+                              <img src="input/Part_2/p2_board_3.jpg" alt="input/Part_2/p2_board_3.jpg" width="100%">
+                              </span>
+                           </p>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td class="tableblock halign-left valign-top" >
+                           <p class="tableblock">
+                              <span class="image">
+                                 <!-- MAKE CHANGES HERE: Part 2a image 1 matlab -->
+                                 <img src="output/Part_2a/p2_board1.png" alt="output/Part_2a/p2_board1.png" width="100%">
+                                 <!-- END CHANGES -->
+                              </span>
+                           </p>
+                        </td>
+                        <td class="tableblock halign-left valign-top" >
+                           <p class="tableblock">
+                              <span class="image">
+                                 <!-- MAKE CHANGES HERE: Part 2a image 2 matlab -->
+                                 <img src="output/Part_2a/p2_board2.png" alt="output/Part_2a/p2_board2.png" width="100%">
+                                 <!-- END CHANGES -->
+                              </span>
+                           </p>
+                        </td>
+                        <td class="tableblock halign-left valign-top" >
+                           <p class="tableblock">
+                              <span class="image">
+                                 <!-- MAKE CHANGES HERE: Part 2a image 3 matlab -->
+                                 <img src="output/Part_2a/p2_board3.png" alt="output/Part_2a/p2_board3.png" width="100%">
+                                 <!-- END CHANGES -->
+                              </span>
+                           </p>
+                        </td>
+                     <tr>
+                        <td class="tableblock halign-left valign-top" >
+                           <p class="tableblock">
+                              <span class="image">
+                                 <!-- MAKE CHANGES HERE: Part 2a image 1 OpenCV -->
+                                 <img src="output/Part_2a/2a1.png" alt="output/Part_2a/placeholder.jpg" width="100%">
+                                 <!-- END CHANGES -->
+                              </span>
+                           </p>
+                        </td>
+                        <td class="tableblock halign-left valign-top" >
+                           <p class="tableblock">
+                              <span class="image">
+                                 <!-- MAKE CHANGES HERE: Part 2a image 2 OpenCV -->
+                                 <img src="output/Part_2a/2a2.png" alt="output/Part_2a/placeholder.jpg" width="100%">
+                                 <!-- END CHANGES -->
+                              </span>
+                           </p>
+                        </td>
+                        <td class="tableblock halign-left valign-top" >
+                           <p class="tableblock">
+                              <span class="image">
+                                 <!-- MAKE CHANGES HERE: Part 2a image 3 OpenCV -->
+                                 <img src="output/Part_2a/2a3.png" alt="output/Part_2a/placeholder.jpg" width="100%">
+                                 <!-- END CHANGES -->
+                              </span>
+                           </p>
+                        </td>
+                     </tr>
+                  </tbody>
+               </table>
+               <div class="listingblock">
+                  <div class="title">Source (Matlab)</div>
+                  <div class="content monospaced">
+                     <!-- MAKE CHANGES HERE: Part 2 code -->
+                     <pre>img1=imread('p2_board_1.jpg');
+img2=imread('p2_board_2.jpg');
+img3=imread('p2_board_3.jpg');
+
+black_on_white_pawn=imread('black_on_white_pawn.png');
+black_on_black_pawn=imread('black_on_black_pawn.png');
+white_on_black_pawn=imread('white_on_black_pawn.png');
+white_on_white_pawn=imread('white_on_white_pawn.png');
+
+img1=InsertBoxes(img1,black_on_white_pawn,black_on_black_pawn,white_on_black_pawn,white_on_white_pawn);
+img2=InsertBoxes(img2,black_on_white_pawn,black_on_black_pawn,white_on_black_pawn,white_on_white_pawn);
+img3=InsertBoxes(img3,black_on_white_pawn,black_on_black_pawn,white_on_black_pawn,white_on_white_pawn);
+
+imwrite(img1,'output/Part_2a/p2_board1.png');
+imwrite(img2,'output/Part_2a/p2_board2.png');
+imwrite(img3,'output/Part_2a/p2_board3.png');
+
+
+
+figure;
+imshow(img1);
+figure;
+imshow(img2);
+figure;
+imshow(img3);
+
+
+function [img]=InsertBoxes(img,black_on_white_pawn,black_on_black_pawn,white_on_black_pawn,white_on_white_pawn)
+for i=1:60:421;
+    for j=1:60:421;
+        if sum(abs(img(i:i+59,j:j+59)-black_on_white_pawn))&lt=100
+            img=insertShape(img, 'Rectangle',[j, i, 58, 58], 'LineWidth',2);
+        end
+        if  sum(abs(img(i:i+59,j:j+59)-black_on_black_pawn))&lt=100
+            img=insertShape(img, 'Rectangle',[j, i, 58, 58], 'LineWidth',2);
+        end
+        if  sum(abs(img(i:i+59,j:j+59)-white_on_black_pawn))&lt=100
+            img=insertShape(img, 'Rectangle',[j, i, 58, 58], 'LineWidth',2);
+        end
+        if  sum(abs(img(i:i+59,j:j+59)-white_on_white_pawn))&lt=100
+            img=insertShape(img, 'Rectangle',[j, i, 58, 58], 'LineWidth',2);   
+        end
+    end
+end 
+
+end
+										</pre>
+                     <!-- END CHANGES -->
+                  </div>
+               </div>
+               <div class="listingblock">
+                  <div class="title">Source (OpenCV)</div>
+                  <div class="content monospaced">
+                     <!-- MAKE CHANGES HERE: Part 2 code -->
+                     <pre>
+
+
+
+#include &ltopencv2/opencv.hpp>
+
+#include "opencv2/imgproc.hpp"
+#include &ltiostream>
+#include &ltstring>
+using namespace cv;
+using namespace std;
+
+Scalar getMSSIM( const Mat& i1, const Mat& i2)
+{
+    const double C1 = 6.5025, C2 = 58.5225;
+    
+    int d     = CV_32F;
+
+    Mat I1, I2;
+    i1.convertTo(I1, d);         
+    i2.convertTo(I2, d);
+
+    Mat I2_2   = I2.mul(I2);        
+    Mat I1_2   = I1.mul(I1);        
+    Mat I1_I2  = I1.mul(I2);        
+
+
+    Mat mu1, mu2;   
+    GaussianBlur(I1, mu1, Size(11, 11), 1.5);
+    GaussianBlur(I2, mu2, Size(11, 11), 1.5);
+
+    Mat mu1_2   =   mu1.mul(mu1);
+    Mat mu2_2   =   mu2.mul(mu2);
+    Mat mu1_mu2 =   mu1.mul(mu2);
+
+    Mat sigma1_2, sigma2_2, sigma12;
+
+    GaussianBlur(I1_2, sigma1_2, Size(11, 11), 1.5);
+    sigma1_2 -= mu1_2;
+
+    GaussianBlur(I2_2, sigma2_2, Size(11, 11), 1.5);
+    sigma2_2 -= mu2_2;
+
+    GaussianBlur(I1_I2, sigma12, Size(11, 11), 1.5);
+    sigma12 -= mu1_mu2;
+
+    
+    Mat t1, t2, t3;
+
+    t1 = 2 * mu1_mu2 + C1;
+    t2 = 2 * sigma12 + C2;
+    t3 = t1.mul(t2);              
+
+    t1 = mu1_2 + mu2_2 + C1;
+    t2 = sigma1_2 + sigma2_2 + C2;
+    t1 = t1.mul(t2);               
+
+    Mat ssim_map;
+    divide(t3, t1, ssim_map);      
+
+    Scalar mssim = mean( ssim_map ); 
+    return mssim;
+}
+
+
+void fun(string input, string output)
+{
+ // Read the image file
+Mat image = imread(input);
+
+Mat black_on_black_pawn=imread("../../input/black_on_black_pawn.png");
+Mat black_on_white_pawn=imread("../../input/black_on_white_pawn.png");
+Mat white_on_white_pawn=imread("../../input/white_on_white_pawn.png");
+Mat white_on_black_pawn=imread("../../input/white_on_black_pawn.png");
+
+Scalar b_o_b_pawn;
+Scalar b_o_w_pawn;
+Scalar w_o_b_pawn;
+Scalar w_o_w_pawn;
+
+cout&lt&ltimage.rows&lt&ltendl;
+cout&lt&ltimage.cols&lt&ltendl;
+int count  = 0;
+
+
+
+
+
+   for(int i=0; i&ltimage.rows; i+=60)
+
+   {
+
+   for(int j=0; j&ltimage.cols; j+=60)
+    {Rect roi(j,i,60,60);
+      count++;
+     Mat cmp= image(roi);
+     b_o_b_pawn= getMSSIM(cmp, black_on_black_pawn);
+     b_o_w_pawn= getMSSIM(cmp, black_on_white_pawn);
+     w_o_b_pawn= getMSSIM(cmp, white_on_black_pawn);
+     w_o_w_pawn= getMSSIM(cmp, white_on_white_pawn); 
+     if (b_o_b_pawn[0]>0.95)
+     {Rect r=Rect(j,i,58,58);
+     rectangle(image,r,Scalar(255,0,0),2,8,0);}
+     if (b_o_w_pawn[0]>0.95)
+     {Rect r=Rect(j,i,58,58);
+     rectangle(image,r,Scalar(255,0,0),2,8,0);}
+     if (w_o_b_pawn[0]>0.95)
+      {Rect r=Rect(j,i,58,58);
+     rectangle(image,r,Scalar(255,0,0),2,8,0);}
+     if (w_o_w_pawn[0]>0.95)
+     {Rect r=Rect(j,i,58,58);
+     rectangle(image,r,Scalar(255,0,0),2,8,0);}
+
+
+   }
+
+}
+
+   
+
+   
+
+cout&lt&ltcount&lt&ltendl;
+imwrite( output, image);
+ 
+ 
+ string windowName = "1"; //Name of the window
+
+ namedWindow(windowName); // Create a window
+
+ imshow(windowName,image); // Show our image inside the created window.
+
+ waitKey(0); // Wait for any keystroke in the window
+
+ destroyWindow(windowName); //destroy the created window
+
+ return ;
+}
+
+
+int main(){
+    fun("p2_board_1.jpg","../../output/Part_2a/2a1.png");
+    fun("p2_board_2.jpg","../../output/Part_2a/2a2.png");
+    fun("p2_board_3.jpg","../../output/Part_2a/2a3.png");
+
+    return 0;
+}
+
+
+
+
+
+										</pre>
+                     <!-- END CHANGES -->
+                  </div>
+               </div>
+            </div>
+         </div>
+         <div class="sect1">
+            <h2 id="_part_2b">Part 2B</h2>
+            <div class="sectionbody">
+               <div class="paragraph">
+                  <p>Count the number of black pawns and white pawns and place
+                 each pawn's index, starting from one, as a text overlay over each pawn accordingly.
+                 Thus, for example, the pawn in &apos;a2&apos; gets the index
+                 1;, the pawn in &apos;b2&apos; gets the index 2, and so forth
+                 until the last pawn gets the index 16.</p>
+                 <p> This part requires two programs, one in Matlab
+                 <strong>and</strong> another with OpenCV. Your program can count black
+                 and white pawns separately or it can count all pawns regardless
+                 of their color.
+                  </p>
+               </div>
+               <table class="tableblock frame-all grid-all" style=" width:100%; ">
+                  <col style="width:33%;">
+                  <col style="width:33%;">
+                  <col style="width:33%;">
+                  <tbody>
+                  <tr>
+                     <td class="tableblock halign-left valign-top" >
+                        <p class="tableblock"><span class="image">
+                              <img src="input/Part_2/p2_board_1.jpg" alt="input/Part_2/p2_board_1.jpg" width="100%">
+                              </span>
+                        </p>
+                     </td>
+                     <td class="tableblock halign-left valign-top" >
+                        <p class="tableblock"><span class="image">
+                              <img src="input/Part_2/p2_board_2.jpg" alt="input/Part_2/p2_board_2.jpg" width="100%">
+                              </span>
+                        </p>
+                     </td>
+                     <td class="tableblock halign-left valign-top" >
+                        <p class="tableblock"><span class="image">
+                              <img src="input/Part_2/p2_board_3.jpg" alt="input/Part_2/p2_board_3.jpg" width="100%">
+                              </span>
+                        </p>
+                     </td>
+                  </tr>
+                  <tr>
+                     <td class="tableblock halign-left valign-top" >
+                        <p class="tableblock">
+                              <span class="image">
+                                 <!-- MAKE CHANGES HERE: Part 2b image 1 Matlab -->
+                                 <img src="output/Part_2b/p2_board1.png" alt="output/Part_2b/p2_board1.png" width="100%">
+                                 <!-- END CHANGES -->
+                              </span>
+                        </p>
+                     </td>
+                     <td class="tableblock halign-left valign-top" >
+                        <p class="tableblock">
+                              <span class="image">
+                                 <!-- MAKE CHANGES HERE: Part 2b image 2 Matlab -->
+                                 <img src="output/Part_2b/p2_board2.png" alt="output/Part_2b/p2_board2.png" width="100%">
+                                 <!-- END CHANGES -->
+                              </span>
+                        </p>
+                     </td>
+                     <td class="tableblock halign-left valign-top" >
+                        <p class="tableblock">
+                              <span class="image">
+                                 <!-- MAKE CHANGES HERE: Part 2b image 3 Matlab -->
+                                 <img src="output/Part_2b/p2_board3.png" alt="output/Part_2b/p2_board3.png" width="100%">
+                                 <!-- END CHANGES -->
+                              </span>
+                        </p>
+                     </td>
+                  </tr>
+                  <tr>
+                     <td class="tableblock halign-left valign-top" >
+                        <p class="tableblock">
+                              <span class="image">
+                                 <!-- MAKE CHANGES HERE: Part 2b image 1 OpenCV -->
+                                 <img src="output/Part_2b/p2_board_1.png" alt="output/Part_2b/placeholder.jpg" width="100%">
+                                 <!-- END CHANGES -->
+                              </span>
+                        </p>
+                     </td>
+                     <td class="tableblock halign-left valign-top" >
+                        <p class="tableblock">
+                              <span class="image">
+                                 <!-- MAKE CHANGES HERE: Part 2b image 2 OpenCV -->
+                                 <img src="output/Part_2b/p2_board_2.png" alt="output/Part_2b/placeholder.jpg" width="100%">
+                                 <!-- END CHANGES -->
+                              </span>
+                        </p>
+                     </td>
+                     <td class="tableblock halign-left valign-top" >
+                        <p class="tableblock">
+                              <span class="image">
+                                 <!-- MAKE CHANGES HERE: Part 2b image 3 OpenCV -->
+                                 <img src="output/Part_2b/p2_board_3.png" alt="output/Part_2b/placeholder.jpg" width="100%">
+                                 <!-- END CHANGES -->
+                              </span>
+                        </p>
+                     </td>
+                  </tr>
+                  </tbody>
+               </table>
+               <div class="listingblock">
+                  <div class="title">Source (Matlab)</div>
+                  <div class="content monospaced">
+                     <!-- MAKE CHANGES HERE: Part 2b code -->
+                     <pre>img1=imread('p2_board_1.jpg');
+img2=imread('p2_board_2.jpg');
+img3=imread('p2_board_3.jpg');
+count=0
+black_on_white_pawn=imread('black_on_white_pawn.png');
+black_on_black_pawn=imread('black_on_black_pawn.png');
+white_on_black_pawn=imread('white_on_black_pawn.png');
+white_on_white_pawn=imread('white_on_white_pawn.png');
+
+img1=countPawns(img1,black_on_white_pawn,black_on_black_pawn,white_on_black_pawn,white_on_white_pawn,count)
+img2=countPawns(img2,black_on_white_pawn,black_on_black_pawn,white_on_black_pawn,white_on_white_pawn,count)
+img3=countPawns(img3,black_on_white_pawn,black_on_black_pawn,white_on_black_pawn,white_on_white_pawn,count)
+
+imwrite(img1,'output/Part_2b/p2_board1.png');
+imwrite(img2,'output/Part_2b/p2_board2.png');
+imwrite(img3,'output/Part_2b/p2_board3.png');
+
+figure;
+imshow(img1);
+figure;
+imshow(img2);
+figure;
+imshow(img3);
+
+function [img]=countPawns(img,black_on_white_pawn,black_on_black_pawn,white_on_black_pawn,white_on_white_pawn,count)
+
+for i=421:-60:1;
+    for j=1:60:421;
+        if sum(abs(img(i:i+59,j:j+59)-black_on_white_pawn))&lt=100 | sum(abs(img(i:i+59,j:j+59)-black_on_black_pawn))&lt=100 | ...
+                sum(abs(img(i:i+59,j:j+59)-white_on_black_pawn))&lt=100 | sum(abs(img(i:i+59,j:j+59)-white_on_white_pawn))&lt=100
+            count=count+1
+            text_str=string(count)
+            position=[j i];
+           img= insertText(img,position,text_str,'FontSize',10,'BoxColor',...
+    'white','BoxOpacity',0.4,'TextColor','black');
+            
+         
+        end
+    end
+end 
+
+end
+
+
+										</pre>
+                     <!-- END CHANGES -->
+                  </div>
+               </div>
+               <div class="listingblock">
+                  <div class="title">Source (OpenCV)</div>
+                  <div class="content monospaced">
+                     <!-- MAKE CHANGES HERE: Part 2b code -->
+                     <pre>
+
+
+
+
+#include &ltopencv2/opencv.hpp>
+#include "opencv2/imgproc.hpp"
+#include &ltiostream>
+#include &ltstdio.h>
+#include &ltstdlib.h>
+
+using namespace cv;
+using namespace std;
+
+Scalar getMSSIM( const Mat& i1, const Mat& i2)
+{
+    const double C1 = 6.5025, C2 = 58.5225;
+    
+    int d     = CV_32F;
+
+    Mat I1, I2;
+    i1.convertTo(I1, d);         
+    i2.convertTo(I2, d);
+
+    Mat I2_2   = I2.mul(I2);        
+    Mat I1_2   = I1.mul(I1);        
+    Mat I1_I2  = I1.mul(I2);        
+
+
+    Mat mu1, mu2;   
+    GaussianBlur(I1, mu1, Size(11, 11), 1.5);
+    GaussianBlur(I2, mu2, Size(11, 11), 1.5);
+
+    Mat mu1_2   =   mu1.mul(mu1);
+    Mat mu2_2   =   mu2.mul(mu2);
+    Mat mu1_mu2 =   mu1.mul(mu2);
+
+    Mat sigma1_2, sigma2_2, sigma12;
+
+    GaussianBlur(I1_2, sigma1_2, Size(11, 11), 1.5);
+    sigma1_2 -= mu1_2;
+
+    GaussianBlur(I2_2, sigma2_2, Size(11, 11), 1.5);
+    sigma2_2 -= mu2_2;
+
+    GaussianBlur(I1_I2, sigma12, Size(11, 11), 1.5);
+    sigma12 -= mu1_mu2;
+
+    
+    Mat t1, t2, t3;
+
+    t1 = 2 * mu1_mu2 + C1;
+    t2 = 2 * sigma12 + C2;
+    t3 = t1.mul(t2);              
+
+    t1 = mu1_2 + mu2_2 + C1;
+    t2 = sigma1_2 + sigma2_2 + C2;
+    t1 = t1.mul(t2);               
+
+    Mat ssim_map;
+    divide(t3, t1, ssim_map);      
+
+    Scalar mssim = mean( ssim_map ); 
+    return mssim;
+}
+
+Mat getLabels(const Mat &image,const Mat &black_on_black_pawn, const Mat &black_on_white_pawn, const Mat &white_on_black_pawn, const Mat &white_on_white_pawn)
+ {  
+    Scalar b_o_b_pawn;
+    Scalar b_o_w_pawn;
+    Scalar w_o_b_pawn;
+    Scalar w_o_w_pawn;
+    int number=1;
+
+    for(int i=image.rows-60; i>0; i-=60)
+
+    {
+
+    for(int j=0; j&ltimage.cols; j+=60)
+     {  
+        Rect roi(j,i,60,60);
+        
+        Mat cmp= image(roi);
+        b_o_b_pawn= getMSSIM(cmp, black_on_black_pawn);
+        b_o_w_pawn= getMSSIM(cmp, black_on_white_pawn);
+        w_o_b_pawn= getMSSIM(cmp, white_on_black_pawn);
+        w_o_w_pawn= getMSSIM(cmp, white_on_white_pawn); 
+
+      if (b_o_b_pawn[0]>0.85 || b_o_w_pawn[0]>0.85 || w_o_b_pawn[0]>0.85 || w_o_w_pawn[0]>0.85) 
+      {  string text=to_string(number);
+        
+          putText(image, text, Point(j+3,i+7), FONT_HERSHEY_COMPLEX_SMALL, 0.5, Scalar(0,0,0),1); 
+
+          number++; 
+
+         }
+
+
+    }
+
+}
+
+return image;
+
+}
+
+
+int main(int argc, char** argv)
+{
+ // Read the image file
+Mat image1 = imread("p2_board_1.jpg");
+Mat image2 = imread("p2_board_2.jpg");
+Mat image3 = imread("p2_board_3.jpg");
+
+Mat black_on_black_pawn=imread("../../input/black_on_black_pawn.png");
+Mat black_on_white_pawn=imread("../../input/black_on_white_pawn.png");
+Mat white_on_white_pawn=imread("../../input/white_on_white_pawn.png");
+Mat white_on_black_pawn=imread("../../input/white_on_black_pawn.png");
+
+image1=getLabels(image1,black_on_black_pawn, black_on_white_pawn,white_on_black_pawn, white_on_white_pawn);
+image2=getLabels(image2,black_on_black_pawn, black_on_white_pawn,white_on_black_pawn, white_on_white_pawn);
+image3=getLabels(image3,black_on_black_pawn, black_on_white_pawn,white_on_black_pawn, white_on_white_pawn);
+
+
+
+
+imwrite( "../../output/Part_2b/p2_board_1.png", image1);
+imwrite( "../../output/Part_2b/p2_board_2.png", image2);
+imwrite( "../../output/Part_2b/p2_board_3.png", image3);
+ 
+ 
+ string windowName1 = "1";
+ string windowName2 = "2";
+ string windowName3 = "3"; //Name of the window
+
+ namedWindow(windowName1); 
+ namedWindow(windowName2);
+ namedWindow(windowName3);// Create a window
+
+ imshow(windowName1,image1);
+ imshow(windowName2,image2);
+ imshow(windowName3,image3); // Show our image inside the created window.
+
+ waitKey(0); // Wait for any keystroke in the window
+
+ destroyWindow(windowName1);
+ waitKey(0); 
+ destroyWindow(windowName2);
+ waitKey(0); 
+ destroyWindow(windowName3); //destroy the created window
+
+ return 0;
+
+}
+
+
+
+
+
+
+
+
+										</pre>
+                     <!-- END CHANGES -->
+                  </div>
+               </div>
+            </div>
+         </div>
+         <div class="sect1">
+            <h2 id="_part_2c">Part 2C</h2>
+            <div class="sectionbody">
+               <div class="paragraph">
+                  <p>Flip the colors of all pawns so that white becomes black
+                 and black becomes white.
+                 This part requires two programs, one in Matlab
+                 <strong>and</strong> another with OpenCV. Your program can count black
+                 and white pawns separately or it can count all pawns regardless
+                 of their color.
+                  </p>
+               </div>
+               <table class="tableblock frame-all grid-all" style=" width:100%; ">
+                  <col style="width:33%;">
+                  <col style="width:33%;">
+                  <col style="width:33%;">
+                  <tbody>
+                  <tr>
+                     <td class="tableblock halign-left valign-top" >
+                        <p class="tableblock"><span class="image">
+                              <img src="input/Part_2/p2_board_1.jpg" alt="input/Part_2/p2_board_1.jpg" width="100%">
+                              </span>
+                        </p>
+                     </td>
+                     <td class="tableblock halign-left valign-top" >
+                        <p class="tableblock"><span class="image">
+                              <img src="input/Part_2/p2_board_2.jpg" alt="input/Part_2/p2_board_2.jpg" width="100%">
+                              </span>
+                        </p>
+                     </td>
+                     <td class="tableblock halign-left valign-top" >
+                        <p class="tableblock"><span class="image">
+                              <img src="input/Part_2/p2_board_3.jpg" alt="input/Part_2/p2_board_3.jpg" width="100%">
+                              </span>
+                        </p>
+                     </td>
+                  </tr>
+                  <tr>
+                     <td class="tableblock halign-left valign-top" >
+                        <p class="tableblock">
+                              <span class="image">
+                                 <!-- MAKE CHANGES HERE: Part 2c image 1 Matlab -->
+                                 <img src="output/Part_2c/p2_board1.png" alt="output/Part_2c/placeholder.jpg" width="100%">
+                                 <!-- END CHANGES -->
+                              </span>
+                        </p>
+                     </td>
+                     <td class="tableblock halign-left valign-top" >
+                        <p class="tableblock">
+                              <span class="image">
+                                 <!-- MAKE CHANGES HERE: Part 2c image 2 Matlab -->
+                                 <img src="output/Part_2c/p2_board2.png" alt="output/Part_2c/placeholder.jpg" width="100%">
+                                 <!-- END CHANGES -->
+                              </span>
+                        </p>
+                     </td>
+                     <td class="tableblock halign-left valign-top" >
+                        <p class="tableblock">
+                              <span class="image">
+                                 <!-- MAKE CHANGES HERE: Part 2c image 3 Matlab -->
+                                 <img src="output/Part_2c/p2_board3.png" alt="output/Part_2c/placeholder.jpg" width="100%">
+                                 <!-- END CHANGES -->
+                              </span>
+                        </p>
+                     </td>
+                  </tr>
+                  <tr>
+                     <td class="tableblock halign-left valign-top" >
+                        <p class="tableblock">
+                              <span class="image">
+                                 <!-- MAKE CHANGES HERE: Part 2c image 1 OpenCV -->
+                                 <img src="output/Part_2c/p2_board_1.png" alt="output/Part_2c/placeholder.jpg" width="100%">
+                                 <!-- END CHANGES -->
+                              </span>
+                        </p>
+                     </td>
+                     <td class="tableblock halign-left valign-top" >
+                        <p class="tableblock">
+                              <span class="image">
+                                 <!-- MAKE CHANGES HERE: Part 2c image 2 OpenCV -->
+                                 <img src="output/Part_2c/p2_board_2.png" alt="output/Part_2c/placeholder.jpg" width="100%">
+                                 <!-- END CHANGES -->
+                              </span>
+                        </p>
+                     </td>
+                     <td class="tableblock halign-left valign-top" >
+                        <p class="tableblock">
+                              <span class="image">
+                                 <!-- MAKE CHANGES HERE: Part 2c image 3 OpenCV -->
+                                 <img src="output/Part_2c/p2_board_3.png" alt="output/Part_2c/placeholder.jpg" width="100%">
+                                 <!-- END CHANGES -->
+                              </span>
+                        </p>
+                     </td>
+                  </tr>
+                  </tbody>
+               </table>
+               <div class="listingblock">
+                  <div class="title">Source (Matlab)</div>
+                  <div class="content monospaced">
+                     <!-- MAKE CHANGES HERE: Part 2c code -->
+                     <pre>img1=imread('p2_board_1.jpg');
+img2=imread('p2_board_2.jpg');
+img3=imread('p2_board_3.jpg');
+
+black_on_white_pawn=imread('black_on_white_pawn.png');
+black_on_black_pawn=imread('black_on_black_pawn.png');
+white_on_black_pawn=imread('white_on_black_pawn.png');
+white_on_white_pawn=imread('white_on_white_pawn.png');
+
+img1=swapPawns(img1,black_on_white_pawn,black_on_black_pawn,...
+                           white_on_black_pawn,white_on_white_pawn)
+img2=swapPawns(img2,black_on_white_pawn,black_on_black_pawn,...
+                           white_on_black_pawn,white_on_white_pawn)
+img3=swapPawns(img3,black_on_white_pawn,black_on_black_pawn,...
+                           white_on_black_pawn,white_on_white_pawn)
+                       
+imwrite(img1,'output/Part_2c/p2_board1.png');
+imwrite(img2,'output/Part_2c/p2_board2.png');
+imwrite(img3,'output/Part_2c/p2_board3.png');
+
+figure();
+imshow(img1);
+figure();
+imshow(img2);
+figure();
+imshow(img3);
+
+
+function [img]= swapPawns(img,black_on_white_pawn,black_on_black_pawn,...
+                           white_on_black_pawn,white_on_white_pawn)
+                       
+black_and_white_image=im2bw(img,0.55);
+image_dup=img;
+black_on_white_pawn_bw=im2bw(black_on_white_pawn);
+white_on_white_pawn_bw=im2bw(white_on_black_pawn);
+for i=1:60:421;
+    for j=1:60:421;
+        if sum(abs(black_and_white_image(i:i+59,j:j+59)-black_on_white_pawn_bw))&lt=5
+            if sum(abs(image_dup(i:i+59,j:j+59)-black_on_white_pawn))&lt ...
+                    sum(abs(image_dup(i:i+59,j:j+59)-black_on_black_pawn))
+            img(i:i+59,j:j+59)=white_on_white_pawn;
+            else
+            img(i:i+59,j:j+59)=white_on_black_pawn;
+            end    
+        end
+        
+        if sum(abs(black_and_white_image(i:i+59,j:j+59)-white_on_white_pawn_bw))&lt=5
+            diff = image_dup(i:i+59,j:j+59);
+            r = sum((diff-white_on_black_pawn)); 
+            t = sum((diff-white_on_white_pawn));   
+            if t &lt r
+            img(i:i+59,j:j+59)=black_on_white_pawn;
+            else
+            img(i:i+59,j:j+59)=black_on_black_pawn;
+            end
+        end
+    end
+end 
+end
+
+										</pre>
+                     <!-- END CHANGES -->
+                  </div>
+               </div>
+               <div class="listingblock">
+                  <div class="title">Source (OpenCV)</div>
+                  <div class="content monospaced">
+                     <!-- MAKE CHANGES HERE: Part 2c code -->
+                     <pre>
+
+
+#include &ltopencv2/opencv.hpp>
+#include "opencv2/imgproc.hpp"
+#include &ltiostream>
+#include &ltstdio.h>
+#include &ltstdlib.h>
+
+using namespace cv;
+using namespace std;
+
+Scalar getMSSIM( const Mat& i1, const Mat& i2)
+{
+    const double C1 = 6.5025, C2 = 58.5225;
+    
+    int d     = CV_32F;
+
+    Mat I1, I2;
+    i1.convertTo(I1, d);         
+    i2.convertTo(I2, d);
+
+    Mat I2_2   = I2.mul(I2);        
+    Mat I1_2   = I1.mul(I1);        
+    Mat I1_I2  = I1.mul(I2);        
+
+
+    Mat mu1, mu2;   
+    GaussianBlur(I1, mu1, Size(11, 11), 1.5);
+    GaussianBlur(I2, mu2, Size(11, 11), 1.5);
+
+    Mat mu1_2   =   mu1.mul(mu1);
+    Mat mu2_2   =   mu2.mul(mu2);
+    Mat mu1_mu2 =   mu1.mul(mu2);
+
+    Mat sigma1_2, sigma2_2, sigma12;
+
+    GaussianBlur(I1_2, sigma1_2, Size(11, 11), 1.5);
+    sigma1_2 -= mu1_2;
+
+    GaussianBlur(I2_2, sigma2_2, Size(11, 11), 1.5);
+    sigma2_2 -= mu2_2;
+
+    GaussianBlur(I1_I2, sigma12, Size(11, 11), 1.5);
+    sigma12 -= mu1_mu2;
+
+    
+    Mat t1, t2, t3;
+
+    t1 = 2 * mu1_mu2 + C1;
+    t2 = 2 * sigma12 + C2;
+    t3 = t1.mul(t2);              
+
+    t1 = mu1_2 + mu2_2 + C1;
+    t2 = sigma1_2 + sigma2_2 + C2;
+    t1 = t1.mul(t2);               
+
+    Mat ssim_map;
+    divide(t3, t1, ssim_map);      
+
+    Scalar mssim = mean( ssim_map ); 
+    return mssim;
+}
+
+Mat swapPawns(const Mat &image,const Mat &black_on_black_pawn, const Mat &black_on_white_pawn, const Mat &white_on_black_pawn, const Mat &white_on_white_pawn)
+ {  
+    Scalar b_o_b_pawn;
+    Scalar b_o_w_pawn;
+    Scalar w_o_b_pawn;
+    Scalar w_o_w_pawn;
+    
+
+    for(int i=0; i&ltimage.rows; i+=60)
+
+    {
+
+    for(int j=0; j&ltimage.cols; j+=60)
+     {  
+        Rect roi(j,i,60,60);
+        
+        Mat cmp= image(roi);
+        b_o_b_pawn= getMSSIM(cmp, black_on_black_pawn);
+        b_o_w_pawn= getMSSIM(cmp, black_on_white_pawn);
+        w_o_b_pawn= getMSSIM(cmp, white_on_black_pawn);
+        w_o_w_pawn= getMSSIM(cmp, white_on_white_pawn); 
+
+      if (b_o_b_pawn[0]>0.95)   
+      {  white_on_black_pawn.copyTo(image(roi));
+
+         }
+      if (b_o_w_pawn[0]>0.95)
+        {  
+            white_on_white_pawn.copyTo(image(roi));
+
+        }
+      if (  w_o_b_pawn[0]>0.95)         
+      {
+         black_on_black_pawn.copyTo(image(roi));
+      }
+      if (w_o_w_pawn[0]>0.95)
+    {
+          black_on_white_pawn.copyTo(image(roi));
+    }
+
+}
+
+}
+
+return image;
+
+}
+
+
+int main(int argc, char** argv)
+{
+ // Read the image file
+Mat image1 = imread("p2_board_1.jpg");
+Mat image2 = imread("p2_board_2.jpg");
+Mat image3 = imread("p2_board_3.jpg");
+
+Mat black_on_black_pawn=imread("../../input/black_on_black_pawn.png");
+Mat black_on_white_pawn=imread("../../input/black_on_white_pawn.png");
+Mat white_on_white_pawn=imread("../../input/white_on_white_pawn.png");
+Mat white_on_black_pawn=imread("../../input/white_on_black_pawn.png");
+
+image1=swapPawns(image1,black_on_black_pawn, black_on_white_pawn,white_on_black_pawn, white_on_white_pawn);
+image2=swapPawns(image2,black_on_black_pawn, black_on_white_pawn,white_on_black_pawn, white_on_white_pawn);
+image3=swapPawns(image3,black_on_black_pawn, black_on_white_pawn,white_on_black_pawn, white_on_white_pawn);
+
+
+
+
+imwrite( "../../output/Part_2c/p2_board_1.png", image1);
+imwrite( "../../output/Part_2c/p2_board_2.png", image2);
+imwrite( "../../output/Part_2c/p2_board_3.png", image3);
+ 
+ 
+ string windowName1 = "1";
+ string windowName2 = "2";
+ string windowName3 = "3"; //Name of the window
+
+ namedWindow(windowName1); 
+ namedWindow(windowName2);
+ namedWindow(windowName3);// Create a window
+
+ imshow(windowName1,image1);
+ imshow(windowName2,image2);
+ imshow(windowName3,image3); // Show our image inside the created window.
+
+ waitKey(0); // Wait for any keystroke in the window
+
+ destroyWindow(windowName1);
+ waitKey(0); 
+ destroyWindow(windowName2);
+ waitKey(0); 
+ destroyWindow(windowName3); //destroy the created window
+
+ return 0;
+
+}
+
+										</pre>
+                     <!-- END CHANGES -->
+                  </div>
+               </div>
+            </div>
+         </div>
+         <div class="sect1">
+            <h2 id="_part_3a">Part 3A</h2>
+            <div class="sectionbody">
+               <div class="paragraph">
+                  <p>Write a program to find all rooks and highlight them (fill in the rook with another color).
+                     Solve this and all subsequent problems using either MATLAB
+                 <strong>or</strong> OpenCV. That is, only one program is
+                 necessary starting from Part 3A.</p>
+               </div>
+               <table class="tableblock frame-all grid-all" style=" width:100%; ">
+                  <col style="width:33%;">
+                  <col style="width:33%;">
+                  <col style="width:33%;">
+                  <tbody>
+                     <tr>
+                        <td class="tableblock halign-left valign-top" >
+                           <p class="tableblock"><span class="image">
+                              <img src="input/Part_3/p3_board_1.jpg" alt="input/Part_3/p3_board_1.jpg" width="100%">
+                              </span>
+                           </p>
+                        </td>
+                        <td class="tableblock halign-left valign-top" >
+                           <p class="tableblock"><span class="image">
+                              <img src="input/Part_3/p3_board_2.jpg" alt="input/Part_3/p3_board_2.jpg" width="100%">
+                              </span>
+                           </p>
+                        </td>
+                        <td class="tableblock halign-left valign-top" >
+                           <p class="tableblock"><span class="image">
+                              <img src="input/Part_3/p3_board_3.jpg" alt="input/Part_3/p3_board_3.jpg" width="100%">
+                              </span>
+                           </p>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td class="tableblock halign-left valign-top" >
+                           <p class="tableblock">
+                              <span class="image">
+                                 <!-- MAKE CHANGES HERE: Part 3a image 1 -->
+                                 <img src="output/Part_3a/p3_board1.png" alt="output/Part_3a/placeholder.jpg" width="100%">
+                                 <!-- END CHANGES -->
+                              </span>
+                           </p>
+                        </td>
+                        <td class="tableblock halign-left valign-top" >
+                           <p class="tableblock">
+                              <span class="image">
+                                 <!-- MAKE CHANGES HERE: Part 3a image 2 -->
+                                 <img src="output/Part_3a/p3_board2.png" alt="output/Part_3a/placeholder.jpg" width="100%">
+                                 <!-- END CHANGES -->
+                              </span>
+                           </p>
+                        </td>
+                        <td class="tableblock halign-left valign-top" >
+                           <p class="tableblock">
+                              <span class="image">
+                                 <!-- MAKE CHANGES HERE: Part 3a image 3 -->
+                                 <img src="output/Part_3a/p3_board3.png" alt="output/Part_3a/placeholder.jpg" width="100%">
+                                 <!-- END CHANGES -->
+                              </span>
+                           </p>
+                        </td>
+                     </tr>
+                  </tbody>
+               </table>
+               <div class="listingblock">
+                  <div class="title">Source</div>
+                  <div class="content monospaced">
+                     <!-- MAKE CHANGES HERE: Part 3a code -->
+                     <pre>img1=imread('input/Part_3/p3_board_1.jpg');
+img2=imread('input/Part_3/p3_board_2.jpg');
+img3=imread('input/Part_3/p3_board_3.jpg');
+
+black_on_white_rook=imread('black_on_white_rook.png');
+black_on_black_rook=imread('black_on_black_rook.png');
+white_on_black_rook=imread('white_on_black_rook.png');
+white_on_white_rook=imread('white_on_white_rook.png');
+
+img1=HighlightRooks(img1,black_on_white_rook,black_on_black_rook,white_on_black_rook,white_on_white_rook)
+img2=HighlightRooks(img2,black_on_white_rook,black_on_black_rook,white_on_black_rook,white_on_white_rook)
+img3=HighlightRooks(img3,black_on_white_rook,black_on_black_rook,white_on_black_rook,white_on_white_rook)
+
+imwrite(img1,'output/Part_3a/p3_board1.png');
+imwrite(img2,'output/Part_3a/p3_board2.png');
+imwrite(img3,'output/Part_3a/p3_board3.png');
+
+figure();
+imshow(img1);
+figure();
+imshow(img2);
+figure();
+imshow(img3);
+
+
+
+function [img]=HighlightRooks(img,black_on_white_rook,black_on_black_rook,white_on_black_rook,white_on_white_rook)
+for i=1:60:421;
+    for j=1:60:421;
+        if sum(abs(img(i:i+59,j:j+59)-black_on_white_rook))&lt=100 | sum(abs(img(i:i+59,j:j+59)-black_on_black_rook))&lt=100 | ...
+            sum(abs(img(i:i+59,j:j+59)-white_on_black_rook))&lt=100 | sum(abs(img(i:i+59,j:j+59)-white_on_white_rook))&lt=100 
+            img=insertShape(img, 'Rectangle',[j, i, 58, 58], 'LineWidth',2);
+        end
+    end
+end
+end
+										</pre>
+                     <!-- END CHANGES -->
+                  </div>
+               </div>
+            </div>
+         </div>
+         <div class="sect1">
+            <h2 id="_part_3b">Part 3B</h2>
+            <div class="sectionbody">
+               <div class="paragraph">
+                  <p>Modify your program to find all rooks, bishops, queens, and
+                 highlight them with a bright color. Use three different
+                 highlighting colors,
+                 to differentiate between these three types of chess figures.
+                 </p>
+               </div>
+               <table class="tableblock frame-all grid-all" style=" width:100%; ">
+                  <col style="width:33%;">
+                  <col style="width:33%;">
+                  <col style="width:33%;">
+                  <tbody>
+                     <tr>
+                        <td class="tableblock halign-left valign-top" >
+                           <p class="tableblock"><span class="image">
+                              <img src="input/Part_3/p3_board_1.jpg" alt="input/Part_3/p3_board_1.jpg" width="100%">
+                              </span>
+                           </p>
+                        </td>
+                        <td class="tableblock halign-left valign-top" >
+                           <p class="tableblock"><span class="image">
+                              <img src="input/Part_3/p3_board_2.jpg" alt="input/Part_3/p3_board_2.jpg" width="100%">
+                              </span>
+                           </p>
+                        </td>
+                        <td class="tableblock halign-left valign-top" >
+                           <p class="tableblock"><span class="image">
+                              <img src="input/Part_3/p3_board_3.jpg" alt="input/Part_3/p3_board_3.jpg" width="100%">
+                              </span>
+                           </p>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td class="tableblock halign-left valign-top" >
+                           <p class="tableblock">
+                              <span class="image">
+                                 <!-- MAKE CHANGES HERE: Part 3b image 1 -->
+                                 <img src="output/Part_3b/p3_board1.png" alt="output/Part_3b/placeholder.jpg" width="100%">
+                                 <!-- END CHANGES -->
+                              </span>
+                           </p>
+                        </td>
+                        <td class="tableblock halign-left valign-top" >
+                           <p class="tableblock">
+                              <span class="image">
+                                 <!-- MAKE CHANGES HERE: Part 3b image 2 -->
+                                 <img src="output/Part_3b/p3_board2.png" alt="output/Part_3b/placeholder.jpg" width="100%">
+                                 <!-- END CHANGES -->
+                              </span>
+                           </p>
+                        </td>
+                        <td class="tableblock halign-left valign-top" >
+                           <p class="tableblock">
+                              <span class="image">
+                                 <!-- MAKE CHANGES HERE: Part 3b image 3 -->
+                                 <img src="output/Part_3b/p3_board3.png" alt="output/Part_3b/placeholder.jpg" width="100%">
+                                 <!-- END CHANGES -->
+                              </span>
+                           </p>
+                        </td>
+                        
+                     </tr>
+                  </tbody>
+               </table>
+               <div class="listingblock">
+                  <div class="title">Source</div>
+                  <div class="content monospaced">
+                     <!-- MAKE CHANGES HERE: Part 3b code -->
+                     <pre>img1=imread('input/Part_3/p3_board_1.jpg');
+img2=imread('input/Part_3/p3_board_2.jpg');
+img3=imread('input/Part_3/p3_board_3.jpg');
+
+black_on_white_rook=imread('black_on_white_rook.png');
+black_on_black_rook=imread('black_on_black_rook.png');
+white_on_black_rook=imread('white_on_black_rook.png');
+white_on_white_rook=imread('white_on_white_rook.png');
+black_on_white_knight=imread('black_on_white_knight.png');
+black_on_black_knight=imread('black_on_black_knight.png');
+white_on_black_knight=imread('white_on_black_knight.png');
+white_on_white_knight=imread('white_on_white_knight.png');
+black_on_white_bishop=imread('black_on_white_bishop.png');
+black_on_black_bishop=imread('black_on_black_bishop.png');
+white_on_black_bishop=imread('white_on_black_bishop.png');
+white_on_white_bishop=imread('white_on_white_bishop.png');
+black_on_black_queen=imread('black_on_black_queen.png');
+white_on_black_queen=imread('white_on_black_queen.png');
+white_on_white_queen=imread('white_on_white_queen.png');
+
+img1=IdentifyRooksBishopsQueens(img1,black_on_white_rook,black_on_black_rook,...
+                                white_on_black_rook,white_on_white_rook,...
+                                black_on_black_queen, white_on_black_queen,...
+                                white_on_white_queen,black_on_white_bishop,...
+                                black_on_black_bishop,white_on_black_bishop,...
+                                white_on_white_bishop)
+                            
+img2=IdentifyRooksBishopsQueens(img2,black_on_white_rook,black_on_black_rook,...
+                                white_on_black_rook,white_on_white_rook,...
+                                black_on_black_queen, white_on_black_queen,...
+                                white_on_white_queen,black_on_white_bishop,...
+                                black_on_black_bishop,white_on_black_bishop,...
+                                white_on_white_bishop)
+img3=IdentifyRooksBishopsQueens(img3,black_on_white_rook,black_on_black_rook,...
+                                white_on_black_rook,white_on_white_rook,...
+                                black_on_black_queen, white_on_black_queen,...
+                                white_on_white_queen,black_on_white_bishop,...
+                                black_on_black_bishop,white_on_black_bishop,...
+                                white_on_white_bishop)
+                            
+imwrite(img1,'output/Part_3b/p3_board1.png');
+imwrite(img2,'output/Part_3b/p3_board2.png');
+imwrite(img3,'output/Part_3c/p3_board3.png');
+
+figure();
+imshow(img1);
+figure();
+imshow(img2);
+figure();
+imshow(img3);
+
+
+function [img]=IdentifyRooksBishopsQueens(img,black_on_white_rook,black_on_black_rook,...
+                                           white_on_black_rook,white_on_white_rook,...
+                                          black_on_black_queen, white_on_black_queen,...
+                                          white_on_white_queen,black_on_white_bishop,...
+                                          black_on_black_bishop,white_on_black_bishop,...
+                                          white_on_white_bishop)
+
+for i=1:60:421;
+    for j=1:60:421;
+        if sum(abs(img(i:i+59,j:j+59)-black_on_white_rook))&lt=100 | sum(abs(img(i:i+59,j:j+59)-black_on_black_rook))&lt=100 | ...
+            sum(abs(img(i:i+59,j:j+59)-white_on_black_rook))&lt=100 | sum(abs(img(i:i+59,j:j+59)-white_on_white_rook))&lt=100 
+            img=insertShape(img, 'Rectangle',[j, i, 58, 58], 'LineWidth',2);
+        end
+        
+        if sum(abs(img(i:i+59,j:j+59)-black_on_black_queen))&lt=100 | ...
+            sum(abs(img(i:i+59,j:j+59)-white_on_black_queen))&lt=100 | sum(abs(img(i:i+59,j:j+59)-white_on_white_queen))&lt=100 
+            img=insertShape(img, 'Rectangle',[j, i, 58, 58],'Color','red', 'LineWidth',2);
+        end
+        
+        if sum(abs(img(i:i+59,j:j+59)-black_on_white_bishop))&lt=100 | sum(abs(img(i:i+59,j:j+59)-black_on_black_bishop))&lt=100 | ...
+            sum(abs(img(i:i+59,j:j+59)-white_on_black_bishop))&lt=100 | sum(abs(img(i:i+59,j:j+59)-white_on_white_bishop))&lt=100 
+            img=insertShape(img, 'Rectangle',[j, i, 58, 58], 'Color','blue', 'LineWidth',2);
+        end
+    end
+end
+end
+
+
+
+
+
+
+
+
+
+
+
+</pre>
+                     <!-- END CHANGES -->
+                  </div>
+               </div>
+            </div>
+         </div>
+         <div class="sect1">
+            <h2 id="_part_4a">Part 4A</h2>
+            <div class="sectionbody">
+               <div class="paragraph">
+                  <p>Detect all white pawns on the top line, and all black pawns
+                  on the bottom line, and replace them with queens of the same
+                  color. That is, replace all white pawns on line 8 with white queens and
+                 all black pawns on line 1 with black queens. </p>
+               </div>
+               <table class="tableblock frame-all grid-all" style=" width:100%; ">
+                  <col style="width:33%;">
+                  <col style="width:33%;">
+                  <col style="width:33%;">
+                  <tbody>
+                     <tr>
+                        <td class="tableblock halign-left valign-top" >
+                           <p class="tableblock"><span class="image">
+                              <img src="input/Part_4/p4_board_1.jpg" alt="input/Part_4/p4_board_1.jpg" width="100%">
+                              </span>
+                           </p>
+                        </td>
+                        <td class="tableblock halign-left valign-top" >
+                           <p class="tableblock"><span class="image">
+                              <img src="input/Part_4/p4_board_2.jpg" alt="input/Part_4/p4_board_2.jpg" width="100%">
+                              </span>
+                           </p>
+                        </td>
+                        <td class="tableblock halign-left valign-top" >
+                           <p class="tableblock"><span class="image">
+                              <img src="input/Part_4/p4_board_3.jpg" alt="input/Part_4/p4_board_3.jpg" width="100%">
+                              </span>
+                           </p>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td class="tableblock halign-left valign-top" >
+                           <p class="tableblock">
+                              <span class="image">
+                                 <!-- MAKE CHANGES HERE: Part 4a image 1 -->
+                                 <img src="output/Part_4a/p4_board1.png" alt="output/Part_4a/placeholder.jpg" width="100%">
+                                 <!-- END CHANGES -->
+                              </span>
+                           </p>
+                        </td>
+                        <td class="tableblock halign-left valign-top" >
+                           <p class="tableblock">
+                              <span class="image">
+                                 <!-- MAKE CHANGES HERE: Part 4a image 2 -->
+                                 <img src="output/Part_4a/p4_board2.png" alt="output/Part_4a/placeholder.jpg" width="100%">
+                                 <!-- END CHANGES -->
+                              </span>
+                           </p>
+                        </td>
+                        <td class="tableblock halign-left valign-top" >
+                           <p class="tableblock">
+                              <span class="image">
+                                 <!-- MAKE CHANGES HERE: Part 4a image 3 -->
+                                 <img src="output/Part_4a/p4_board3.png" alt="output/Part_4a/placeholder.jpg" width="100%">
+                                 <!-- END CHANGES -->
+                              </span>
+                           </p>
+                        </td>
+                        
+                     </tr>
+                  </tbody>
+               </table>
+               <div class="listingblock">
+                  <div class="title">Source</div>
+                  <div class="content monospaced">
+                     <!-- MAKE CHANGES HERE: Part 4a code -->
+                     <pre>img1=imread('input/Part_4/p4_board_1.jpg');
+img2=imread('input/Part_4/p4_board_2.jpg');
+img3=imread('input/Part_4/p4_board_3.jpg');
+
+
+black_on_white_pawn=imread('black_on_white_pawn.png');
+black_on_black_pawn=imread('black_on_black_pawn.png');
+white_on_black_pawn=imread('white_on_black_pawn.png');
+white_on_white_pawn=imread('white_on_white_pawn.png');
+
+black_on_white_queen=imread('black_on_white_queen.png');
+black_on_black_queen=imread('black_on_black_queen.png');
+white_on_black_queen=imread('white_on_black_queen.png');
+white_on_white_queen=imread('white_on_white_queen.png');
+
+img1= ReplaceWithQueens(img1,black_on_white_pawn,black_on_black_pawn,...
+                                  white_on_black_pawn,white_on_white_pawn,...
+                                  black_on_white_queen,black_on_black_queen,...
+                                  white_on_black_queen,white_on_white_queen)
+img2= ReplaceWithQueens(img2,black_on_white_pawn,black_on_black_pawn,...
+                                  white_on_black_pawn,white_on_white_pawn,...
+                                  black_on_white_queen,black_on_black_queen,...
+                                  white_on_black_queen,white_on_white_queen)
+img3= ReplaceWithQueens(img3,black_on_white_pawn,black_on_black_pawn,...
+                                  white_on_black_pawn,white_on_white_pawn,...
+                                  black_on_white_queen,black_on_black_queen,...
+                                  white_on_black_queen,white_on_white_queen)
+                              
+imwrite(img1,'output/Part_4a/p4_board1.png');
+imwrite(img2,'output/Part_4a/p4_board2.png');
+imwrite(img3,'output/Part_4a/p4_board3.png');
+
+figure();
+imshow(img1);
+figure();
+imshow(img2);
+figure();
+imshow(img3);
+
+
+
+
+
+function [gray_img]= ReplaceWithQueens(img,black_on_white_pawn,black_on_black_pawn,...
+                                  white_on_black_pawn,white_on_white_pawn,...
+                                  black_on_white_queen,black_on_black_queen,...
+                                  white_on_black_queen,white_on_white_queen)
+gray_img=rgb2gray(img);
+black_and_white_image=im2bw(gray_img,0.55);
+image_dup=gray_img;
+black_on_white_pawn_bw=im2bw(black_on_white_pawn);
+white_on_white_pawn_bw=im2bw(white_on_black_pawn);
+
+for i=1:420:421;
+    for j=1:60:421;
+        
+        a1=ssim(image_dup(i:i+59,j:j+59),black_on_white_pawn)
+        a2=ssim(image_dup(i:i+59,j:j+59),black_on_black_pawn)
+        a3=ssim(image_dup(i:i+59,j:j+59),white_on_white_pawn)
+        a4=ssim(image_dup(i:i+59,j:j+59),white_on_black_pawn)
+       if sum(abs(black_and_white_image(i:i+59,j:j+59)-white_on_white_pawn_bw))&lt=5 
+            if a3&gt0.95
+            gray_img(i:i+59,j:j+59)=white_on_white_queen;
+            else
+            gray_img(i:i+59,j:j+59)=white_on_black_queen;
+            end  
+       end
+        
+       if sum(abs(black_and_white_image(i:i+59,j:j+59)-black_on_white_pawn_bw))&lt=5 
+            if a1&gt0.90
+                gray_img(i:i+59,j:j+59)=black_on_white_queen;
+            else
+                gray_img(i:i+59,j:j+59)=black_on_black_queen;
+            end
+       end
+        
+    end
+end 
+
+end
+
+										</pre>
+                     <!-- END CHANGES -->
+                  </div>
+               </div>
+            </div>
+         </div>
+         <div class="sect1">
+            <h2 id="_part_4b">Part 4B</h2>
+            <div class="sectionbody">
+               <div class="paragraph">
+                  <p>Modify your program from Part 4A to work with a slightly noisy board with grain.</p>
+               </div>
+               <table class="tableblock frame-all grid-all" style=" width:100%; ">
+                  <col style="width:33%;">
+                  <col style="width:33%;">
+                  <col style="width:33%;">
+                  <tbody>
+                  <tr>
+                     <td class="tableblock halign-left valign-top" >
+                        <p class="tableblock"><span class="image">
+                              <img src="input/Part_4/p4_board_1_grain.jpg" alt="input/Part_4/p4_board_1_grain.jpg" width="100%">
+                              </span>
+                        </p>
+                     </td>
+                     <td class="tableblock halign-left valign-top" >
+                        <p class="tableblock"><span class="image">
+                              <img src="input/Part_4/p4_board_2_grain.jpg" alt="input/Part_4/p4_board_2_grain.jpg" width="100%">
+                              </span>
+                        </p>
+                     </td>
+                     <td class="tableblock halign-left valign-top" >
+                        <p class="tableblock"><span class="image">
+                              <img src="input/Part_4/p4_board_3_grain.jpg" alt="input/Part_4/p4_board_3_grain.jpg" width="100%">
+                              </span>
+                        </p>
+                     </td>
+                  </tr>
+                  <tr>
+                     <td class="tableblock halign-left valign-top" >
+                        <p class="tableblock">
+                              <span class="image">
+                                 <!-- MAKE CHANGES HERE: Part 4b image 1 -->
+                                 <img src="output/Part_4b/p4_board1.png" alt="output/Part_4b/placeholder.jpg" width="100%">
+                                 <!-- END CHANGES -->
+                              </span>
+                        </p>
+                     </td>
+                     <td class="tableblock halign-left valign-top" >
+                        <p class="tableblock">
+                              <span class="image">
+                                 <!-- MAKE CHANGES HERE: Part 4b image 2 -->
+                                 <img src="output/Part_4b/p4_board2.png" alt="output/Part_4b/placeholder.jpg" width="100%">
+                                 <!-- END CHANGES -->
+                              </span>
+                        </p>
+                     </td>
+                     <td class="tableblock halign-left valign-top" >
+                        <p class="tableblock">
+                              <span class="image">
+                                 <!-- MAKE CHANGES HERE: Part 4b image 3 -->
+                                 <img src="output/Part_4b/p4_board3.png" alt="output/Part_4b/placeholder.jpg" width="100%">
+                                 <!-- END CHANGES -->
+                              </span>
+                        </p>
+                     </td>
+
+                  </tr>
+                  </tbody>
+               </table>
+               <div class="listingblock">
+                  <div class="title">Source</div>
+                  <div class="content monospaced">
+                     <!-- MAKE CHANGES HERE: Part 4b code -->
+                     <pre>img1=imread('input/Part_4/p4_board_1.jpg');
+img2=imread('input/Part_4/p4_board_2.jpg');
+img3=imread('input/Part_4/p4_board_3.jpg');
+
+
+black_on_white_pawn=imread('black_on_white_pawn.png');
+black_on_black_pawn=imread('black_on_black_pawn.png');
+white_on_black_pawn=imread('white_on_black_pawn.png');
+white_on_white_pawn=imread('white_on_white_pawn.png');
+
+black_on_white_queen=imread('black_on_white_queen.png');
+black_on_black_queen=imread('black_on_black_queen.png');
+white_on_black_queen=imread('white_on_black_queen.png');
+white_on_white_queen=imread('white_on_white_queen.png');
+
+img1= ReplaceWithQueens(img1,black_on_white_pawn,black_on_black_pawn,...
+                                  white_on_black_pawn,white_on_white_pawn,...
+                                  black_on_white_queen,black_on_black_queen,...
+                                  white_on_black_queen,white_on_white_queen)
+img2= ReplaceWithQueens(img2,black_on_white_pawn,black_on_black_pawn,...
+                                  white_on_black_pawn,white_on_white_pawn,...
+                                  black_on_white_queen,black_on_black_queen,...
+                                  white_on_black_queen,white_on_white_queen)
+img3= ReplaceWithQueens(img3,black_on_white_pawn,black_on_black_pawn,...
+                                  white_on_black_pawn,white_on_white_pawn,...
+                                  black_on_white_queen,black_on_black_queen,...
+                                  white_on_black_queen,white_on_white_queen)
+                              
+imwrite(img1,'output/Part_4a/p4_board1.png');
+imwrite(img2,'output/Part_4a/p4_board2.png');
+imwrite(img3,'output/Part_4a/p4_board3.png');
+
+figure();
+imshow(img1);
+figure();
+imshow(img2);
+figure();
+imshow(img3);
+
+
+
+
+
+function [gray_img]= ReplaceWithQueens(img,black_on_white_pawn,black_on_black_pawn,...
+                                  white_on_black_pawn,white_on_white_pawn,...
+                                  black_on_white_queen,black_on_black_queen,...
+                                  white_on_black_queen,white_on_white_queen)
+gray_img=rgb2gray(img);
+gray_img=medfilt2(gray_img)
+black_and_white_image=im2bw(gray_img,0.55);
+image_dup=gray_img;
+black_on_white_pawn_bw=im2bw(black_on_white_pawn);
+white_on_white_pawn_bw=im2bw(white_on_black_pawn);
+
+for i=1:420:421;
+    for j=1:60:421;
+        
+        a1=ssim(image_dup(i:i+59,j:j+59),black_on_white_pawn)
+        a2=ssim(image_dup(i:i+59,j:j+59),black_on_black_pawn)
+        a3=ssim(image_dup(i:i+59,j:j+59),white_on_white_pawn)
+        a4=ssim(image_dup(i:i+59,j:j+59),white_on_black_pawn)
+       if sum(abs(black_and_white_image(i:i+59,j:j+59)-white_on_white_pawn_bw))&lt=5 
+            if a3&gt0.95
+            gray_img(i:i+59,j:j+59)=white_on_white_queen;
+            else
+            gray_img(i:i+59,j:j+59)=white_on_black_queen;
+            end  
+       end
+        
+       if sum(abs(black_and_white_image(i:i+59,j:j+59)-black_on_white_pawn_bw))&lt=5 
+            if a1&gt0.90
+                gray_img(i:i+59,j:j+59)=black_on_white_queen;
+            else
+                gray_img(i:i+59,j:j+59)=black_on_black_queen;
+            end
+       end
+        
+    end
+end 
+
+end
+
+										</pre>
+                     <!-- END CHANGES -->
+                  </div>
+               </div>
+            </div>
+         </div>
+         <div class="sect1">
+            <h2 id="_part_5a">Part 5A</h2>
+            <div class="sectionbody">
+               <div class="paragraph">
+                  <p>Detect the position and color of all chess pieces and output the information to a text file.</p>
+               </div>
+               <div class="listingblock">
+                  <div class="title">Text Output Example for Image 1</div>
+                  <div class="content monospaced">
+                     <pre>
+A8: Black Rook
+B8: Empty
+C8: Empty
+... (continue top row (8) here)
+
+A7: Black Pawn
+B7: Black Pawn
+... (continue row here)
+
+...
+... (continue middle rows here)
+
+A1: White Rook
+B1: Empty
+C1: Empty
+D1: White King
+... (continue bottom row (1) here)</pre>
+                  </div>
+               </div>
+               <table class="tableblock frame-all grid-all" style=" width:100%; ">
+                  <col style="width:33%;">
+                  <col style="width:33%;">
+                  <col style="width:33%;">
+                  <tbody>
+                  <tr>
+                     <td class="tableblock halign-left valign-top" >
+                        <p class="tableblock"><span class="image">
+                              <img src="input/Part_5/p5_board_1.jpg" alt="input/Part_5/p5_board_1.jpg" width="100%">
+                              </span>
+                        </p>
+                     </td>
+                     <td class="tableblock halign-left valign-top" >
+                        <p class="tableblock"><span class="image">
+                              <img src="input/Part_5/p5_board_2.jpg" alt="input/Part_5/p5_board_2.jpg" width="100%">
+                              </span>
+                        </p>
+                     </td>
+                     <td class="tableblock halign-left valign-top" >
+                        <p class="tableblock"><span class="image">
+                              <img src="input/Part_5/p5_board_3.jpg" alt="input/Part_5/p5_board_3.jpg" width="100%">
+                              </span>
+                        </p>
+                     </td>
+                  </tr>
+                  <tr>
+                     <td class="tableblock halign-left valign-top" >
+                        <p class="tableblock">
+                              <span class="image">
+                                 <!-- MAKE CHANGES HERE: Part 5a image 1 -->
+                                 <img src="output/Part_5a/placeholder.jpg" alt="output/Part_5a/placeholder.jpg" width="100%">
+                                 <!-- END CHANGES -->
+                              </span>
+                        </p>
+                     </td>
+                     <td class="tableblock halign-left valign-top" >
+                        <p class="tableblock">
+                              <span class="image">
+                                 <!-- MAKE CHANGES HERE: Part 5a image 2 -->
+                                 <img src="output/Part_5a/placeholder.jpg" alt="output/Part_5a/placeholder.jpg" width="100%">
+                                 <!-- END CHANGES -->
+                              </span>
+                        </p>
+                     </td>
+                     <td class="tableblock halign-left valign-top" >
+                        <p class="tableblock">
+                              <span class="image">
+                                 <!-- MAKE CHANGES HERE: Part 5a image 3 -->
+                                 <img src="output/Part_5a/placeholder.jpg" alt="output/Part_5a/placeholder.jpg" width="100%">
+                                 <!-- END CHANGES -->
+                              </span>
+                        </p>
+                     </td>
+
+                  </tr>
+                  <tr>
+                     <td class="tableblock halign-left valign-top">
+                        <div class="codetext">
+                           <h3><strong>Output 1:</strong></h3>
+                           <div class="listingblock">
+                              <div class="content monospaced">
+                     <pre>
+A8 : Black Rook
+B8 : Empty
+C8 : Empty
+D8 : Empty
+E8 : Empty
+F8 : Black Rook
+G8 : Empty
+H8 : Black King
+A7 : Black Pawn
+B7 : Black Pawn
+C7 : Empty
+D7 : Empty
+E7 : Black Bishop
+F7 : Empty
+G7 : Black Pawn
+H7 : Empty
+A6 : Empty
+B6 : Black Queen
+C6 : Empty
+D6 : Black Pawn
+E6 : Empty
+F6 : Empty
+G6 : Empty
+H6 : Black Pawn
+A5 : Empty
+B5 : Empty
+C5 : Empty
+D5 : Empty
+E5 : Black Pawn
+F5 : Empty
+G5 : Empty
+H5 : Empty
+A4 : Empty
+B4 : Empty
+C4 : White Bishop
+D4 : Empty
+E4 : Empty
+F4 : Empty
+G4 : Black Knight
+H4 : Empty
+A3 : White Pawn
+B3 : Empty
+C3 : Empty
+D3 : Empty
+E3 : Empty
+F3 : Empty
+G3 : Empty
+H3 : Empty
+A2 : Empty
+B2 : White Pawn
+C2 : White Pawn
+D2 : White Bishop
+E2 : White Knight
+F2 : White Pawn
+G2 : White Pawn
+H2 : White Pawn
+A1 : White Rook
+B1 : Empty
+C1 : Empty
+D1 : White Queen
+E1 : Empty
+F1 : White Rook
+G1 : White King
+H1 : Empty
+
+
+
+</pre>
+                              </div>
+                           </div>
+                        </div>
+                     </td>
+                     <td class="tableblock halign-left valign-top">
+                        <div class="codetext">
+                           <h3><strong>Output 2:</strong></h3>
+                           <div class="listingblock">
+                              <div class="content monospaced">
+                     <pre>
+A8 : Empty
+B8 : Empty
+C8 : Black Bishop
+D8 : Black Queen
+E8 : Black King
+F8 : Empty
+G8 : Empty
+H8 : Empty
+A7 : Empty
+B7 : Empty
+C7 : Black Pawn
+D7 : Empty
+E7 : Black Knight
+F7 : Empty
+G7 : White Pawn
+H7 : Empty
+A6 : Empty
+B6 : Empty
+C6 : White Knight
+D6 : Black Pawn
+E6 : Empty
+F6 : Empty
+G6 : Empty
+H6 : Black Rook
+A5 : Empty
+B5 : Black Pawn
+C5 : Black Knight
+D5 : White Pawn
+E5 : Empty
+F5 : Empty
+G5 : White Knight
+H5 : Black Pawn
+A4 : Black Rook
+B4 : Black Pawn
+C4 : Empty
+D4 : Empty
+E4 : Black Pawn
+F4 : Empty
+G4 : Empty
+H4 : White Rook
+A3 : White Pawn
+B3 : Empty
+C3 : Empty
+D3 : Empty
+E3 : White Pawn
+F3 : Empty
+G3 : Empty
+H3 : Empty
+A2 : Empty
+B2 : Empty
+C2 : White Pawn
+D2 : Empty
+E2 : Empty
+F2 : Empty
+G2 : Empty
+H2 : Empty
+A1 : White Rook
+B1 : Empty
+C1 : White Bishop
+D1 : White Queen
+E1 : White King
+F1 : White Bishop
+G1 : Empty
+H1 : Empty
+
+
+</pre>
+                              </div>
+                           </div>
+                        </div>
+                     </td>
+                     <td class="tableblock halign-left valign-top">
+                        <div class="codetext">
+                           <h3><strong>Output 3:</strong></h3>
+                           <div class="listingblock">
+                              <div class="content monospaced">
+                     <pre>
+A8 : Empty
+B8 : Black Queen
+C8 : Empty
+D8 : Empty
+E8 : Empty
+F8 : Empty
+G8 : Black King
+H8 : Empty
+A7 : Empty
+B7 : Empty
+C7 : Black Pawn
+D7 : White Pawn
+E7 : Empty
+F7 : Empty
+G7 : Empty
+H7 : Empty
+A6 : Black Bishop
+B6 : Black Knight
+C6 : White Pawn
+D6 : Empty
+E6 : Black Pawn
+F6 : Empty
+G6 : Empty
+H6 : Black Bishop
+A5 : Black Rook
+B5 : White Queen
+C5 : White Bishop
+D5 : Empty
+E5 : Black Knight
+F5 : Black Rook
+G5 : Black Pawn
+H5 : White Pawn
+A4 : Empty
+B4 : Empty
+C4 : Empty
+D4 : Empty
+E4 : Empty
+F4 : Empty
+G4 : White Pawn
+H4 : Empty
+A3 : Empty
+B3 : White Pawn
+C3 : Empty
+D3 : Empty
+E3 : White Pawn
+F3 : Empty
+G3 : Empty
+H3 : White Rook
+A2 : White King
+B2 : Empty
+C2 : White Pawn
+D2 : White Bishop
+E2 : White Knight
+F2 : White Pawn
+G2 : Empty
+H2 : Empty
+A1 : Empty
+B1 : Empty
+C1 : White Rook
+D1 : Empty
+E1 : Empty
+F1 : Empty
+G1 : Empty
+H1 : Empty
+
+</pre>
+                              </div>
+                           </div>
+                        </div>
+                     </td>
+                  </tr>
+                  </tbody>
+               </table>
+               <div class="listingblock">
+                  <div class="title">Source</div>
+                  <div class="content monospaced">
+                     <!-- MAKE CHANGES HERE: Part 5a code -->
+                     <pre>
+
+
+#include &ltopencv2/opencv.hpp>
+#include "opencv2/imgproc.hpp"
+#include &ltiostream>
+#include &ltstdio.h>
+#include &ltstdlib.h>
+#include &ltfstream>
+
+using namespace cv;
+using namespace std;
+
+ Mat black_on_black_pawn;
+ Mat black_on_white_pawn;
+ Mat white_on_white_pawn;
+ Mat white_on_black_pawn;
+
+ Mat black_on_black_bishop;
+ Mat black_on_white_bishop;
+ Mat white_on_white_bishop;
+ Mat white_on_black_bishop;
+
+ Mat black_on_black_knight;
+ Mat black_on_white_knight;
+ Mat white_on_white_knight;
+ Mat white_on_black_knight;
+
+ Mat black_on_black_rook;
+ Mat black_on_white_rook;
+ Mat white_on_white_rook;
+ Mat white_on_black_rook;
+
+ Mat black_on_black_queen;
+ Mat black_on_white_queen;
+ Mat white_on_white_queen;
+ Mat white_on_black_queen;
+
+ Mat black_on_black_king;
+ Mat black_on_white_king;
+ Mat white_on_white_king;
+ Mat white_on_black_king;
+
+ Mat black_square;
+ Mat white_square;
+
+
+
+
+Scalar getMSSIM( const Mat& i1, const Mat& i2)
+{
+    const double C1 = 6.5025, C2 = 58.5225;
+    
+    int d     = CV_32F;
+
+    Mat I1, I2;
+    i1.convertTo(I1, d);         
+    i2.convertTo(I2, d);
+
+    Mat I2_2   = I2.mul(I2);        
+    Mat I1_2   = I1.mul(I1);        
+    Mat I1_I2  = I1.mul(I2);        
+
+
+    Mat mu1, mu2;   
+    GaussianBlur(I1, mu1, Size(11, 11), 1.5);
+    GaussianBlur(I2, mu2, Size(11, 11), 1.5);
+
+    Mat mu1_2   =   mu1.mul(mu1);
+    Mat mu2_2   =   mu2.mul(mu2);
+    Mat mu1_mu2 =   mu1.mul(mu2);
+
+    Mat sigma1_2, sigma2_2, sigma12;
+
+    GaussianBlur(I1_2, sigma1_2, Size(11, 11), 1.5);
+    sigma1_2 -= mu1_2;
+
+    GaussianBlur(I2_2, sigma2_2, Size(11, 11), 1.5);
+    sigma2_2 -= mu2_2;
+
+    GaussianBlur(I1_I2, sigma12, Size(11, 11), 1.5);
+    sigma12 -= mu1_mu2;
+
+    
+    Mat t1, t2, t3;
+
+    t1 = 2 * mu1_mu2 + C1;
+    t2 = 2 * sigma12 + C2;
+    t3 = t1.mul(t2);              
+
+    t1 = mu1_2 + mu2_2 + C1;
+    t2 = sigma1_2 + sigma2_2 + C2;
+    t1 = t1.mul(t2);               
+
+    Mat ssim_map;
+    divide(t3, t1, ssim_map);      
+
+    Scalar mssim = mean( ssim_map ); 
+    return mssim;
+}
+
+string detectChessPiece(const Mat &image)
+ 
+ {  string ans;
+     
+    Scalar b_pawn;
+    Scalar w_pawn;
+    
+
+    Scalar b_rook;
+    Scalar w_rook;
+
+    Scalar b_knight;
+    Scalar w_knight;
+
+    Scalar b_bishop;
+    Scalar w_bishop;
+
+    Scalar b_queen;
+    Scalar w_queen;
+
+    Scalar b_king;
+    Scalar w_king;
+
+    Scalar b;
+    Scalar w;
+
+
+    
+    b_pawn=getMSSIM(black_on_black_pawn,image);
+    w_pawn=getMSSIM(white_on_white_pawn,image);
+
+    b_rook=getMSSIM(black_on_black_rook,image);
+    w_rook=getMSSIM(white_on_white_rook,image);
+
+    b_knight=getMSSIM(black_on_black_knight,image);
+    w_knight=getMSSIM(white_on_white_knight,image);
+
+    b_bishop=getMSSIM(black_on_black_bishop,image);
+    w_bishop=getMSSIM(white_on_white_bishop,image);
+
+    b_queen=getMSSIM(black_on_black_queen,image);
+    w_queen=getMSSIM(white_on_white_queen,image);
+
+    
+
+    b_king=getMSSIM(black_on_white_king,image);
+    w_king=getMSSIM(white_on_black_king,image);
+
+    b=getMSSIM(black_square,image);
+    w=getMSSIM(white_square,image);
+
+
+    if(b_pawn[0]>0.85)
+        ans="Black Pawn";
+    else if(w_pawn[0]>0.85)
+        ans="White Pawn";
+    else if(b_rook[0]>0.85)
+        ans="Black Rook";
+    else if(w_rook[0]>0.85)
+        ans="White Rook";
+    else if(b_knight[0]>0.85)
+        ans="Black Knight";
+    else if(w_knight[0]>0.85)
+        ans="White Knight";
+    else if(b_bishop[0]>0.85)
+        ans="Black Bishop";
+    else if(w_bishop[0]>0.85)
+        ans="White Bishop";
+    else if(b_queen[0]>0.85)
+        ans="Black Queen";
+    else if(w_queen[0]>0.85)
+        ans="White Queen";
+    else if(b_king[0]>0.85)
+        ans="Black King";
+    else if(w_king[0]>0.85)
+        ans="White King";
+    else 
+        ans="Empty";
+
+    return ans;
+
+ }
+
+void WriteToFile(string imagename, string filename)
+{ 
+   Mat img=imread(imagename); 
+
+   ofstream myfile;
+   myfile.open(filename);
+   
+    char number='8';
+
+
+ for(int i=0; i&ltimg.rows; i+=60)
+
+{  char letter='A';
+ 
+  for(int j=0; j&ltimg.cols; j+=60)
+      
+      {   
+        string ans;
+        
+        Rect roi(j,i,60,60);
+        
+        // Mat cmp= image(roi);
+        Mat cmp= img(roi);
+
+        ans.push_back(letter);
+        ans.push_back(number);
+        ans+=" : ";
+        ans+=detectChessPiece(cmp);
+        ans+="\n";
+        myfile&lt&ltans;
+        
+        letter++;
+
+     }
+        cout&lt&ltendl;
+        number--;
+
+ }
+
+
+myfile.close();
+      
+
+
+}
+    
+
+
+
+
+int main(int argc, char** argv)
+{
+ // Read the image file
+string imagename1= "p5_board_1.jpg";
+string imagename2= "p5_board_2.jpg";
+string imagename3= "p5_board_3.jpg";
+
+string filename1="5a_ans1.txt";
+string filename2="5a_ans2.txt";
+string filename3="5a_ans3.txt";
+
+black_on_black_pawn=imread("../../input/black_on_black_pawn.png");
+black_on_white_pawn=imread("../../input/black_on_white_pawn.png");
+white_on_white_pawn=imread("../../input/white_on_white_pawn.png");
+white_on_black_pawn=imread("../../input/white_on_black_pawn.png");
+
+black_on_black_bishop=imread("../../input/black_on_black_bishop.png");
+black_on_white_bishop=imread("../../input/black_on_white_bishop.png");
+white_on_white_bishop=imread("../../input/white_on_white_bishop.png");
+white_on_black_bishop=imread("../../input/white_on_black_bishop.png");
+
+black_on_black_rook=imread("../../input/black_on_black_rook.png");
+black_on_white_rook=imread("../../input/black_on_white_rook.png");
+white_on_white_rook=imread("../../input/white_on_white_rook.png");
+white_on_black_rook=imread("../../input/white_on_black_rook.png");
+
+black_on_black_queen=imread("../../input/black_on_black_queen.png");
+black_on_white_queen=imread("../../input/black_on_white_queen.png");
+white_on_white_queen=imread("../../input/white_on_white_queen.png");
+white_on_black_queen=imread("../../input/white_on_black_queen.png");
+
+black_on_black_knight=imread("../../input/black_on_black_knight.png");
+black_on_white_knight=imread("../../input/black_on_white_knight.png");
+white_on_white_knight=imread("../../input/white_on_white_knight.png");
+white_on_black_knight=imread("../../input/white_on_black_knight.png");
+
+black_on_black_king=imread("../../input/black_on_black_king.png");
+black_on_white_king=imread("../../input/black_on_white_king.png");
+white_on_white_king=imread("../../input/white_on_white_king.png");
+white_on_black_king=imread("../../input/white_on_black_king.png");
+
+black_square=imread("../../input/black_square.png");
+white_square=imread("../../input/white_square.png");
+
+
+WriteToFile(imagename1,filename1);
+WriteToFile(imagename2,filename2);
+WriteToFile(imagename3,filename3);
+    
+
+
+ return 0;
+
+}
+
+
+
+										</pre>
+                     <!-- END CHANGES -->
+                  </div>
+               </div>
+            </div>
+         </div>
+         <div class="sect1">
+            <h2 id="_part_5b">Part 5B</h2>
+            <div class="sectionbody">
+               <div class="paragraph">
+                  <p>Modify your program from Part 4B to work with a slightly noisy board with grain.</p>
+               </div>
+               <table class="tableblock frame-all grid-all" style=" width:100%; ">
+                  <col style="width:33%;">
+                  <col style="width:33%;">
+                  <col style="width:33%;">
+                  <tbody>
+                  <tr>
+                     <td class="tableblock halign-left valign-top" >
+                        <p class="tableblock"><span class="image">
+                              <img src="input/Part_5/p5_board_1b_grain.jpg" alt="input/Part_5/p5_board_1b_grain.jpg" width="100%">
+                              </span>
+                        </p>
+                     </td>
+                     <td class="tableblock halign-left valign-top" >
+                        <p class="tableblock"><span class="image">
+                              <img src="input/Part_5/p5_board_2b_grain.jpg" alt="input/Part_5/p5_board_2b_grain.jpg" width="100%">
+                              </span>
+                        </p>
+                     </td>
+                     <td class="tableblock halign-left valign-top" >
+                        <p class="tableblock"><span class="image">
+                              <img src="input/Part_5/p5_board_3b_grain.jpg" alt="input/Part_5/p5_board_3b_grain.jpg" width="100%">
+                              </span>
+                        </p>
+                     </td>
+                  </tr>
+                  <tr>
+                     <td class="tableblock halign-left valign-top" >
+                        <p class="tableblock">
+                              <span class="image">
+                                 <!-- MAKE CHANGES HERE: Part 5b image 1 -->
+                                 <img src="output/Part_5b/placeholder.jpg" alt="output/Part_5b/placeholder.jpg" width="100%">
+                                 <!-- END CHANGES -->
+                              </span>
+                        </p>
+                     </td>
+                     <td class="tableblock halign-left valign-top" >
+                        <p class="tableblock">
+                              <span class="image">
+                                 <!-- MAKE CHANGES HERE: Part 5b image 2 -->
+                                 <img src="output/Part_5b/placeholder.jpg" alt="output/Part_5b/placeholder.jpg" width="100%">
+                                 <!-- END CHANGES -->
+                              </span>
+                        </p>
+                     </td>
+                     <td class="tableblock halign-left valign-top" >
+                        <p class="tableblock">
+                              <span class="image">
+                                 <!-- MAKE CHANGES HERE: Part 5b image 3 -->
+                                 <img src="output/Part_5b/placeholder.jpg" alt="output/Part_5b/placeholder.jpg" width="100%">
+                                 <!-- END CHANGES -->
+                              </span>
+                        </p>
+                     </td>
+
+                  </tr>
+                  <tr>
+                     <td class="tableblock halign-left valign-top">
+                        <div class="codetext">
+                           <h3><strong>Output 1:</strong></h3>
+                           <div class="listingblock">
+                              <div class="content monospaced">
+                     <pre>
+A8 : Black Rook
+B8 : Empty
+C8 : Black Bishop
+D8 : Black Queen
+E8 : Black King
+F8 : Black Bishop
+G8 : Empty
+H8 : Empty
+A7 : Black Pawn
+B7 : Empty
+C7 : Black Pawn
+D7 : Black Knight
+E7 : Empty
+F7 : Empty
+G7 : Empty
+H7 : Empty
+A6 : Empty
+B6 : Empty
+C6 : Empty
+D6 : Empty
+E6 : Black Pawn
+F6 : Black Knight
+G6 : White Knight
+H6 : Black Pawn
+A5 : Empty
+B5 : White Pawn
+C5 : Empty
+D5 : Black Rook
+E5 : White Pawn
+F5 : Black Pawn
+G5 : Empty
+H5 : White Pawn
+A4 : Empty
+B4 : Empty
+C4 : Empty
+D4 : White Pawn
+E4 : Empty
+F4 : White Rook
+G4 : Empty
+H4 : Empty
+A3 : White Bishop
+B3 : White Pawn
+C3 : White Knight
+D3 : Empty
+E3 : Empty
+F3 : Empty
+G3 : White Pawn
+H3 : Empty
+A2 : Empty
+B2 : Empty
+C2 : Empty
+D2 : White Pawn
+E2 : Empty
+F2 : Empty
+G2 : Empty
+H2 : Empty
+A1 : White Rook
+B1 : Empty
+C1 : Empty
+D1 : White Queen
+E1 : White King
+F1 : White Bishop
+G1 : Empty
+H1 : Empty
+                        
+
+
+                     </pre>
+                              </div>
+                           </div>
+                        </div>
+                     </td>
+                     <td class="tableblock halign-left valign-top">
+                        <div class="codetext">
+                           <h3><strong>Output 2:</strong></h3>
+                           <div class="listingblock">
+                              <div class="content monospaced">
+                     <pre>
+A8 : Empty
+B8 : Empty
+C8 : Black King
+D8 : Black Rook
+E8 : Empty
+F8 : Empty
+G8 : Empty
+H8 : Black Rook
+A7 : Empty
+B7 : Black Bishop
+C7 : Empty
+D7 : Black Knight
+E7 : Black Queen
+F7 : Black Pawn
+G7 : Empty
+H7 : Black Pawn
+A6 : Black Pawn
+B6 : Empty
+C6 : Black Pawn
+D6 : Black Pawn
+E6 : Empty
+F6 : Black Knight
+G6 : Black Pawn
+H6 : Empty
+A5 : Empty
+B5 : Black Pawn
+C5 : Empty
+D5 : Empty
+E5 : Empty
+F5 : Empty
+G5 : Empty
+H5 : Empty
+A4 : Empty
+B4 : Empty
+C4 : Empty
+D4 : White Knight
+E4 : White Pawn
+F4 : Empty
+G4 : Empty
+H4 : Empty
+A3 : White Pawn
+B3 : Empty
+C3 : White Knight
+D3 : Empty
+E3 : Empty
+F3 : White Pawn
+G3 : Empty
+H3 : Empty
+A2 : Empty
+B2 : White Pawn
+C2 : White Pawn
+D2 : White Pawn
+E2 : Empty
+F2 : Empty
+G2 : White Pawn
+H2 : White Pawn
+A1 : Empty
+B1 : White King
+C1 : Empty
+D1 : Empty
+E1 : Empty
+F1 : White Bishop
+G1 : White Rook
+H1 : White Rook
+
+
+</pre>
+                              </div>
+                           </div>
+                        </div>
+                     </td>
+                     <td class="tableblock halign-left valign-top">
+                        <div class="codetext">
+                           <h3><strong>Output 3:</strong></h3>
+                           <div class="listingblock">
+                              <div class="content monospaced">
+                     <pre>
+A8 : Black Rook
+B8 : Empty
+C8 : Empty
+D8 : Black Queen
+E8 : Black King
+F8 : Black Bishop
+G8 : Empty
+H8 : Empty
+A7 : Empty
+B7 : Empty
+C7 : Empty
+D7 : Black Bishop
+E7 : Empty
+F7 : Empty
+G7 : Empty
+H7 : Empty
+A6 : Black Pawn
+B6 : Empty
+C6 : Black Pawn
+D6 : Empty
+E6 : Black Pawn
+F6 : Empty
+G6 : White Knight
+H6 : Empty
+A5 : White Pawn
+B5 : Black Pawn
+C5 : Empty
+D5 : Black Pawn
+E5 : Empty
+F5 : Black Pawn
+G5 : Empty
+H5 : Black Rook
+A4 : Empty
+B4 : White Pawn
+C4 : White Knight
+D4 : White Pawn
+E4 : Black Knight
+F4 : Empty
+G4 : Black Pawn
+H4 : Empty
+A3 : White Rook
+B3 : Empty
+C3 : White Pawn
+D3 : Empty
+E3 : White Pawn
+F3 : Empty
+G3 : White Pawn
+H3 : Black Pawn
+A2 : Empty
+B2 : Empty
+C2 : Empty
+D2 : Empty
+E2 : Empty
+F2 : White Pawn
+G2 : Empty
+H2 : White Pawn
+A1 : Empty
+B1 : Empty
+C1 : White Bishop
+D1 : White Queen
+E1 : White King
+F1 : White Bishop
+G1 : Empty
+H1 : White Rook
+
+
+</pre>
+                              </div>
+                           </div>
+                        </div>
+                     </td>
+                  </tr>
+                  </tbody>
+               </table>
+               <div class="listingblock">
+                  <div class="title">Source</div>
+                  <div class="content monospaced">
+                     <!-- MAKE CHANGES HERE: Part 5b code -->
+                     <pre>
+
+
+#include &ltopencv2/opencv.hpp>
+#include "opencv2/imgproc.hpp"
+#include &ltiostream>
+#include &ltstdio.h>
+#include &ltstdlib.h>
+#include &ltfstream>
+
+using namespace cv;
+using namespace std;
+
+ Mat black_on_black_pawn;
+ Mat black_on_white_pawn;
+ Mat white_on_white_pawn;
+ Mat white_on_black_pawn;
+
+ Mat black_on_black_bishop;
+ Mat black_on_white_bishop;
+ Mat white_on_white_bishop;
+ Mat white_on_black_bishop;
+
+ Mat black_on_black_knight;
+ Mat black_on_white_knight;
+ Mat white_on_white_knight;
+ Mat white_on_black_knight;
+
+ Mat black_on_black_rook;
+ Mat black_on_white_rook;
+ Mat white_on_white_rook;
+ Mat white_on_black_rook;
+
+ Mat black_on_black_queen;
+ Mat black_on_white_queen;
+ Mat white_on_white_queen;
+ Mat white_on_black_queen;
+
+ Mat black_on_black_king;
+ Mat black_on_white_king;
+ Mat white_on_white_king;
+ Mat white_on_black_king;
+
+ Mat black_square;
+ Mat white_square;
+
+
+
+
+Scalar getMSSIM( const Mat& i1, const Mat& i2)
+{
+    const double C1 = 6.5025, C2 = 58.5225;
+    
+    int d     = CV_32F;
+
+    Mat I1, I2;
+    i1.convertTo(I1, d);         
+    i2.convertTo(I2, d);
+
+    Mat I2_2   = I2.mul(I2);        
+    Mat I1_2   = I1.mul(I1);        
+    Mat I1_I2  = I1.mul(I2);        
+
+
+    Mat mu1, mu2;   
+    GaussianBlur(I1, mu1, Size(11, 11), 1.5);
+    GaussianBlur(I2, mu2, Size(11, 11), 1.5);
+
+    Mat mu1_2   =   mu1.mul(mu1);
+    Mat mu2_2   =   mu2.mul(mu2);
+    Mat mu1_mu2 =   mu1.mul(mu2);
+
+    Mat sigma1_2, sigma2_2, sigma12;
+
+    GaussianBlur(I1_2, sigma1_2, Size(11, 11), 1.5);
+    sigma1_2 -= mu1_2;
+
+    GaussianBlur(I2_2, sigma2_2, Size(11, 11), 1.5);
+    sigma2_2 -= mu2_2;
+
+    GaussianBlur(I1_I2, sigma12, Size(11, 11), 1.5);
+    sigma12 -= mu1_mu2;
+
+    
+    Mat t1, t2, t3;
+
+    t1 = 2 * mu1_mu2 + C1;
+    t2 = 2 * sigma12 + C2;
+    t3 = t1.mul(t2);              
+
+    t1 = mu1_2 + mu2_2 + C1;
+    t2 = sigma1_2 + sigma2_2 + C2;
+    t1 = t1.mul(t2);               
+
+    Mat ssim_map;
+    divide(t3, t1, ssim_map);      
+
+    Scalar mssim = mean( ssim_map ); 
+    return mssim;
+}
+
+string detectChessPiece(const Mat &image)
+ 
+ {  string ans;
+     
+    Scalar b_pawn;
+    Scalar w_pawn;
+    
+
+    Scalar b_rook;
+    Scalar w_rook;
+
+    Scalar b_knight;
+    Scalar w_knight;
+
+    Scalar b_bishop;
+    Scalar w_bishop;
+
+    Scalar b_queen;
+    Scalar w_queen;
+
+    Scalar b_king;
+    Scalar w_king;
+
+    Scalar b;
+    Scalar w;
+
+
+    
+    b_pawn=getMSSIM(black_on_black_pawn,image);
+    w_pawn=getMSSIM(white_on_white_pawn,image);
+
+    b_rook=getMSSIM(black_on_black_rook,image);
+    w_rook=getMSSIM(white_on_white_rook,image);
+
+    b_knight=getMSSIM(black_on_black_knight,image);
+    w_knight=getMSSIM(white_on_white_knight,image);
+
+    b_bishop=getMSSIM(black_on_black_bishop,image);
+    w_bishop=getMSSIM(white_on_white_bishop,image);
+
+    b_queen=getMSSIM(black_on_black_queen,image);
+    w_queen=getMSSIM(white_on_white_queen,image);
+
+    
+
+    b_king=getMSSIM(black_on_white_king,image);
+    w_king=getMSSIM(white_on_black_king,image);
+
+    b=getMSSIM(black_square,image);
+    w=getMSSIM(white_square,image);
+
+
+    if(b_pawn[0]>0.85)
+        ans="Black Pawn";
+    else if(w_pawn[0]>0.85)
+        ans="White Pawn";
+    else if(b_rook[0]>0.85)
+        ans="Black Rook";
+    else if(w_rook[0]>0.85)
+        ans="White Rook";
+    else if(b_knight[0]>0.85)
+        ans="Black Knight";
+    else if(w_knight[0]>0.85)
+        ans="White Knight";
+    else if(b_bishop[0]>0.85)
+        ans="Black Bishop";
+    else if(w_bishop[0]>0.85)
+        ans="White Bishop";
+    else if(b_queen[0]>0.85)
+        ans="Black Queen";
+    else if(w_queen[0]>0.85)
+        ans="White Queen";
+    else if(b_king[0]>0.85)
+        ans="Black King";
+    else if(w_king[0]>0.85)
+        ans="White King";
+    else 
+        ans="Empty";
+
+    return ans;
+
+ }
+
+void WriteToFile(string imagename, string filename)
+{ 
+   Mat unfiltered_img=imread(imagename); 
+   Mat img;
+   medianBlur(unfiltered_img,img,3);
+
+   ofstream myfile;
+   myfile.open(filename);
+   
+    char number='8';
+
+
+ for(int i=0; i&ltimg.rows; i+=60)
+
+{  char letter='A';
+ 
+  for(int j=0; j&ltimg.cols; j+=60)
+      
+      {   
+        string ans;
+        
+        Rect roi(j,i,60,60);
+        
+        // Mat cmp= image(roi);
+        Mat cmp= img(roi);
+
+        ans.push_back(letter);
+        ans.push_back(number);
+        ans+=" : ";
+        ans+=detectChessPiece(cmp);
+        ans+="\n";
+        myfile&lt&ltans;
+        
+        letter++;
+
+     }
+        cout&lt&ltendl;
+        number--;
+
+ }
+
+
+myfile.close();
+      
+
+
+}
+    
+
+
+
+
+int main(int argc, char** argv)
+{
+ // Read the image file
+string imagename1= "p5_board_1b_grain.jpg";
+string imagename2= "p5_board_2b_grain.jpg";
+string imagename3= "p5_board_3b_grain.jpg";
+
+string filename1="5b_ans1.txt";
+string filename2="5b_ans2.txt";
+string filename3="5b_ans3.txt";
+
+
+black_on_black_pawn=imread("../../input/black_on_black_pawn.png");
+black_on_white_pawn=imread("../../input/black_on_white_pawn.png");
+white_on_white_pawn=imread("../../input/white_on_white_pawn.png");
+white_on_black_pawn=imread("../../input/white_on_black_pawn.png");
+
+black_on_black_bishop=imread("../../input/black_on_black_bishop.png");
+black_on_white_bishop=imread("../../input/black_on_white_bishop.png");
+white_on_white_bishop=imread("../../input/white_on_white_bishop.png");
+white_on_black_bishop=imread("../../input/white_on_black_bishop.png");
+
+black_on_black_rook=imread("../../input/black_on_black_rook.png");
+black_on_white_rook=imread("../../input/black_on_white_rook.png");
+white_on_white_rook=imread("../../input/white_on_white_rook.png");
+white_on_black_rook=imread("../../input/white_on_black_rook.png");
+
+black_on_black_queen=imread("../../input/black_on_black_queen.png");
+black_on_white_queen=imread("../../input/black_on_white_queen.png");
+white_on_white_queen=imread("../../input/white_on_white_queen.png");
+white_on_black_queen=imread("../../input/white_on_black_queen.png");
+
+black_on_black_knight=imread("../../input/black_on_black_knight.png");
+black_on_white_knight=imread("../../input/black_on_white_knight.png");
+white_on_white_knight=imread("../../input/white_on_white_knight.png");
+white_on_black_knight=imread("../../input/white_on_black_knight.png");
+
+black_on_black_king=imread("../../input/black_on_black_king.png");
+black_on_white_king=imread("../../input/black_on_white_king.png");
+white_on_white_king=imread("../../input/white_on_white_king.png");
+white_on_black_king=imread("../../input/white_on_black_king.png");
+
+black_square=imread("../../input/black_square.png");
+white_square=imread("../../input/white_square.png");
+
+WriteToFile(imagename1,filename1);
+WriteToFile(imagename2,filename2);
+WriteToFile(imagename3,filename3);
+    
+
+
+ return 0;
+
+}
+
+										</pre>
+                     <!-- END CHANGES -->
+                  </div>
+               </div>
+            </div>
+         </div>
+         <div class="sect1">
+            <h2 id="_part_5c">Part 5C (EXTRA CREDIT)</h2>
+            <div class="sectionbody">
+               <div class="paragraph">
+                  <p>Detect the position and color of all chess pieces again, but with real images of the screen. (FOR EXTRA CREDIT)</p>
+               </div>
+               <table class="tableblock frame-all grid-all" style=" width:100%; ">
+                  <col style="width:33%;">
+                  <col style="width:33%;">
+                  <col style="width:33%;">
+                  <tbody>
+                  <tr>
+                     <td class="tableblock halign-left valign-top" >
+                        <p class="tableblock"><span class="image">
+                              <img src="input/Part_5/p5_board_1_screen.jpg" alt="input/Part_5/p5_board_1_screen.jpg" width="100%">
+                              </span>
+                        </p>
+                     </td>
+                     <td class="tableblock halign-left valign-top" >
+                        <p class="tableblock"><span class="image">
+                              <img src="input/Part_5/p5_board_2_screen.jpg" alt="input/Part_5/p5_board_2_screen.jpg" width="100%">
+                              </span>
+                        </p>
+                     </td>
+                     <td class="tableblock halign-left valign-top" >
+                        <p class="tableblock"><span class="image">
+                              <img src="input/Part_5/p5_board_3_screen.jpg" alt="input/Part_5/p5_board_3_screen.jpg" width="100%">
+                              </span>
+                        </p>
+                     </td>
+                  </tr>
+                  <tr>
+                     <td class="tableblock halign-left valign-top" >
+                        <p class="tableblock">
+                              <span class="image">
+                                 <!-- MAKE CHANGES HERE: Part 5c image 1 -->
+                                 <img src="output/Part_5c/placeholder.jpg" alt="output/Part_5c/placeholder.jpg" width="100%">
+                                 <!-- END CHANGES -->
+                              </span>
+                        </p>
+                     </td>
+                     <td class="tableblock halign-left valign-top" >
+                        <p class="tableblock">
+                              <span class="image">
+                                 <!-- MAKE CHANGES HERE: Part 5c image 2 -->
+                                 <img src="output/Part_5c/placeholder.jpg" alt="output/Part_5c/placeholder.jpg" width="100%">
+                                 <!-- END CHANGES -->
+                              </span>
+                        </p>
+                     </td>
+                     <td class="tableblock halign-left valign-top" >
+                        <p class="tableblock">
+                              <span class="image">
+                                 <!-- MAKE CHANGES HERE: Part 5c image 3 -->
+                                 <img src="output/Part_5c/placeholder.jpg" alt="output/Part_5c/placeholder.jpg" width="100%">
+                                 <!-- END CHANGES -->
+                              </span>
+                        </p>
+                     </td>
+
+                  </tr>
+                  <tr>
+                     <td class="tableblock halign-left valign-top">
+                        <div class="codetext">
+                           <h3><strong>Output 1:</strong></h3>
+                           <div class="listingblock">
+                              <div class="content monospaced">
+                     <pre>
+Enter the output of your program here.</pre>
+                              </div>
+                           </div>
+                        </div>
+                     </td>
+                     <td class="tableblock halign-left valign-top">
+                        <div class="codetext">
+                           <h3><strong>Output 2:</strong></h3>
+                           <div class="listingblock">
+                              <div class="content monospaced">
+                     <pre>
+Enter the output of your program here.</pre>
+                              </div>
+                           </div>
+                        </div>
+                     </td>
+                     <td class="tableblock halign-left valign-top">
+                        <div class="codetext">
+                           <h3><strong>Output 3:</strong></h3>
+                           <div class="listingblock">
+                              <div class="content monospaced">
+                     <pre>
+Enter the output of your program here.</pre>
+                              </div>
+                           </div>
+                        </div>
+                     </td>
+                  </tr>
+                  </tbody>
+               </table>
+               <div class="listingblock">
+                  <div class="title">Source</div>
+                  <div class="content monospaced">
+                     <!-- MAKE CHANGES HERE: Part 5c code -->
+                     <pre>
+// Insert your code here
+										</pre>
+                     <!-- END CHANGES -->
+                  </div>
+               </div>
+            </div>
+         </div>
+         <div class="sect1">
+            <h2 id="_part_6a">Part 6A (EXTRA CREDIT)</h2>
+            <div class="sectionbody">
+               <div class="paragraph">
+                  <p>Swap all queens for pawns and pawns for queens. (FOR EXTRA CREDIT)</p>
+               </div>
+               <table class="tableblock frame-all grid-all" style=" width:100%; ">
+                  <col style="width:33%;">
+                  <col style="width:33%;">
+                  <col style="width:33%;">
+                  <tbody>
+                     <tr>
+                        <td class="tableblock halign-left valign-top" >
+                           <p class="tableblock"><span class="image">
+                              <img src="input/Part_6/p6_board_1.jpg" alt="input/Part_6/p6_board_1.jpg" width="100%">
+                              </span>
+                           </p>
+                        </td>
+                        <td class="tableblock halign-left valign-top" >
+                           <p class="tableblock"><span class="image">
+                              <img src="input/Part_6/p6_board_2.jpg" alt="input/Part_6/p6_board_2.jpg" width="100%">
+                              </span>
+                           </p>
+                        </td>
+                        <td class="tableblock halign-left valign-top" >
+                           <p class="tableblock"><span class="image">
+                              <img src="input/Part_6/p6_board_3.jpg" alt="input/Part_6/p6_board_3.jpg" width="100%">
+                              </span>
+                           </p>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td class="tableblock halign-left valign-top" >
+                           <p class="tableblock">
+                              <span class="image">
+                                 <!-- MAKE CHANGES HERE: Part 6a image 1 -->
+                                 <img src="output/Part_6a/p6_board1.png" alt="output/Part_6a/placeholder.jpg" width="100%">
+                                 <!-- END CHANGES -->
+                              </span>
+                           </p>
+                        </td>
+                        <td class="tableblock halign-left valign-top" >
+                           <p class="tableblock">
+                              <span class="image">
+                                 <!-- MAKE CHANGES HERE: Part 6a image 2 -->
+                                 <img src="output/Part_6a/p6_board2.png" alt="output/Part_6a/placeholder.jpg" width="100%">
+                                 <!-- END CHANGES -->
+                              </span>
+                           </p>
+                        </td>
+                        <td class="tableblock halign-left valign-top" >
+                           <p class="tableblock">
+                              <span class="image">
+                                 <!-- MAKE CHANGES HERE: Part 6a image 3 -->
+                                 <img src="output/Part_6a/p6_board3.png" alt="output/Part_6a/placeholder.jpg" width="100%">
+                                 <!-- END CHANGES -->
+                              </span>
+                           </p>
+                        </td>
+                     </tr>
+                  </tbody>
+               </table>
+               <div class="listingblock">
+                  <div class="title">Source</div>
+                  <div class="content monospaced">
+                     <!-- MAKE CHANGES HERE: Part 6a code -->
+                     <pre>img1=imread('input/Part_6/p6_board_1.jpg');
+img2=imread('input/Part_6/p6_board_2.jpg');
+img3=imread('input/Part_6/p6_board_3.jpg');
+
+black_on_black_queen=imread('black_on_black_queen.png');
+black_on_white_queen=imread('black_on_white_queen.png');
+white_on_black_queen=imread('white_on_black_queen.png');
+white_on_white_queen=imread('white_on_white_queen.png');
+
+black_on_white_pawn=imread('black_on_white_pawn.png');
+black_on_black_pawn=imread('black_on_black_pawn.png');
+white_on_black_pawn=imread('white_on_black_pawn.png');
+white_on_white_pawn=imread('white_on_white_pawn.png');
+
+
+img1=SwapPawnsAndQueens(img1,black_on_black_queen, black_on_white_queen, ...
+                                   white_on_black_queen,white_on_white_queen,...
+                                   black_on_white_pawn,black_on_black_pawn,...
+                                   white_on_black_pawn,white_on_white_pawn)
+                               
+img2=SwapPawnsAndQueens(img2,black_on_black_queen, black_on_white_queen, ...
+                                   white_on_black_queen,white_on_white_queen,...
+                                   black_on_white_pawn,black_on_black_pawn,...
+                                   white_on_black_pawn,white_on_white_pawn)
+                               
+img3=SwapPawnsAndQueens(img3,black_on_black_queen, black_on_white_queen, ...
+                                   white_on_black_queen,white_on_white_queen,...
+                                   black_on_white_pawn,black_on_black_pawn,...
+                                   white_on_black_pawn,white_on_white_pawn)
+                               
+imwrite(img1,'output/Part_6a/p6_board1.png');
+imwrite(img2,'output/Part_6a/p6_board2.png');
+imwrite(img3,'output/Part_6a/p6_board3.png');                              
+                               
+                               
+figure();
+imshow(img1);
+figure();
+imshow(img2);
+figure();
+imshow(img3);
+
+
+
+
+
+function [img]=SwapPawnsAndQueens(img,black_on_black_queen, black_on_white_queen, ...
+                                   white_on_black_queen,white_on_white_queen,...
+                                   black_on_white_pawn,black_on_black_pawn,...
+                                   white_on_black_pawn,white_on_white_pawn)
+
+img=rgb2gray(img);
+
+
+for i=1:60:421;
+    for j=1:60:421;
+        
+        if ssim(img(i:i+59,j:j+59),black_on_black_pawn)&gt0.95
+            img(i:i+59,j:j+59)= black_on_black_queen;
+        elseif ssim(img(i:i+59,j:j+59),black_on_white_pawn)&gt0.95
+            img(i:i+59,j:j+59)= black_on_white_queen;
+        elseif ssim(img(i:i+59,j:j+59),white_on_black_pawn)&gt0.95
+            img(i:i+59,j:j+59)= white_on_black_queen;
+        
+        elseif ssim(img(i:i+59,j:j+59),white_on_white_pawn)&gt0.95
+            img(i:i+59,j:j+59)= white_on_white_queen;
+        elseif ssim(img(i:i+59,j:j+59),black_on_black_queen)&gt0.95
+            img(i:i+59,j:j+59)= black_on_black_pawn;
+        elseif ssim(img(i:i+59,j:j+59),black_on_white_queen)&gt0.95
+            img(i:i+59,j:j+59)= black_on_white_pawn;
+        elseif ssim(img(i:i+59,j:j+59),white_on_black_queen)&gt0.95
+            img(i:i+59,j:j+59)= white_on_black_pawn;
+        
+        elseif ssim(img(i:i+59,j:j+59),white_on_white_queen)&gt0.95
+            img(i:i+59,j:j+59)= white_on_white_pawn;
+        end
+            
+    end
+end
+
+end
+            
+                
+        
+            
+            
+        
+                                   
+
+                                   
+
+
+										</pre>
+                     <!-- END CHANGES -->
+                  </div>
+               </div>
+            </div>
+         </div>
+         <div class="sect1">
+            <h2 id="_part_6b">Part 6B (EXTRA CREDIT)</h2>
+            <div class="sectionbody">
+               <div class="paragraph">
+                  <p>Modify your code to work with grain added to the images. (FOR EXTRA CREDIT)</p>
+               </div>
+               <table class="tableblock frame-all grid-all" style=" width:100%; ">
+                  <col style="width:33%;">
+                  <col style="width:33%;">
+                  <col style="width:33%;">
+                  <tbody>
+                  <tr>
+                     <td class="tableblock halign-left valign-top" >
+                        <p class="tableblock"><span class="image">
+                              <img src="input/Part_6/p6_board_1_grain.jpg" alt="input/Part_6/p6_board_1_grain.jpg" width="100%">
+                              </span>
+                        </p>
+                     </td>
+                     <td class="tableblock halign-left valign-top" >
+                        <p class="tableblock"><span class="image">
+                              <img src="input/Part_6/p6_board_2_grain.jpg" alt="input/Part_6/p6_board_2_grain.jpg" width="100%">
+                              </span>
+                        </p>
+                     </td>
+                     <td class="tableblock halign-left valign-top" >
+                        <p class="tableblock"><span class="image">
+                              <img src="input/Part_6/p6_board_3_grain.jpg" alt="input/Part_6/p6_board_3_grain.jpg" width="100%">
+                              </span>
+                        </p>
+                     </td>
+                  </tr>
+                  <tr>
+                     <td class="tableblock halign-left valign-top" >
+                        <p class="tableblock">
+                              <span class="image">
+                                 <!-- MAKE CHANGES HERE: Part 6b image 1 -->
+                                 <img src="output/Part_6b/p6_board1.png" alt="output/Part_6b/placeholder.jpg" width="100%">
+                                 <!-- END CHANGES -->
+                              </span>
+                        </p>
+                     </td>
+                     <td class="tableblock halign-left valign-top" >
+                        <p class="tableblock">
+                              <span class="image">
+                                 <!-- MAKE CHANGES HERE: Part 6b image 2 -->
+                                 <img src="output/Part_6b/p6_board2.png" alt="output/Part_6b/placeholder.jpg" width="100%">
+                                 <!-- END CHANGES -->
+                              </span>
+                        </p>
+                     </td>
+                     <td class="tableblock halign-left valign-top" >
+                        <p class="tableblock">
+                              <span class="image">
+                                 <!-- MAKE CHANGES HERE: Part 6b image 3 -->
+                                 <img src="output/Part_6b/p6_board3.png" alt="output/Part_6b/placeholder.jpg" width="100%">
+                                 <!-- END CHANGES -->
+                              </span>
+                        </p>
+                     </td>
+                  </tr>
+                  </tbody>
+               </table>
+               <div class="listingblock">
+                  <div class="title">Source</div>
+                  <div class="content monospaced">
+                     <!-- MAKE CHANGES HERE: Part 4a code -->
+                     <pre>img1=imread('input/Part_6/p6_board_1_grain.jpg');
+img2=imread('input/Part_6/p6_board_2_grain.jpg');
+img3=imread('input/Part_6/p6_board_3_grain.jpg');
+
+black_on_black_queen=imread('black_on_black_queen.png');
+black_on_white_queen=imread('black_on_white_queen.png');
+white_on_black_queen=imread('white_on_black_queen.png');
+white_on_white_queen=imread('white_on_white_queen.png');
+
+black_on_white_pawn=imread('black_on_white_pawn.png');
+black_on_black_pawn=imread('black_on_black_pawn.png');
+white_on_black_pawn=imread('white_on_black_pawn.png');
+white_on_white_pawn=imread('white_on_white_pawn.png');
+
+
+img1=SwapPawnsAndQueens(img1,black_on_black_queen, black_on_white_queen, ...
+                                   white_on_black_queen,white_on_white_queen,...
+                                   black_on_white_pawn,black_on_black_pawn,...
+                                   white_on_black_pawn,white_on_white_pawn)
+                               
+img2=SwapPawnsAndQueens(img2,black_on_black_queen, black_on_white_queen, ...
+                                   white_on_black_queen,white_on_white_queen,...
+                                   black_on_white_pawn,black_on_black_pawn,...
+                                   white_on_black_pawn,white_on_white_pawn)
+                               
+img3=SwapPawnsAndQueens(img3,black_on_black_queen, black_on_white_queen, ...
+                                   white_on_black_queen,white_on_white_queen,...
+                                   black_on_white_pawn,black_on_black_pawn,...
+                                   white_on_black_pawn,white_on_white_pawn)
+                               
+imwrite(img1,'output/Part_6a/p6_board1.png');
+imwrite(img2,'output/Part_6a/p6_board2.png');
+imwrite(img3,'output/Part_6a/p6_board3.png');                              
+                               
+                               
+figure();
+imshow(img1);
+figure();
+imshow(img2);
+figure();
+imshow(img3);
+
+function [img]=SwapPawnsAndQueens(img,black_on_black_queen, black_on_white_queen, ...
+                                   white_on_black_queen,white_on_white_queen,...
+                                   black_on_white_pawn,black_on_black_pawn,...
+                                   white_on_black_pawn,white_on_white_pawn)
+
+img=rgb2gray(img);
+img=medfilt2(img);
+
+
+
+for i=1:60:421;
+    for j=1:60:421;
+        
+        if ssim(img(i:i+59,j:j+59),black_on_black_pawn)&gt0.95
+            img(i:i+59,j:j+59)= black_on_black_queen;
+        elseif ssim(img(i:i+59,j:j+59),black_on_white_pawn)&gt0.95
+            img(i:i+59,j:j+59)= black_on_white_queen;
+        elseif ssim(img(i:i+59,j:j+59),white_on_black_pawn)&gt0.95
+            img(i:i+59,j:j+59)= white_on_black_queen;
+        
+        elseif ssim(img(i:i+59,j:j+59),white_on_white_pawn)&gt0.95
+            img(i:i+59,j:j+59)= white_on_white_queen;
+        elseif ssim(img(i:i+59,j:j+59),black_on_black_queen)&gt0.90
+            img(i:i+59,j:j+59)= black_on_black_pawn;
+        elseif ssim(img(i:i+59,j:j+59),black_on_white_queen)&gt0.90
+            img(i:i+59,j:j+59)= black_on_white_pawn;
+        elseif ssim(img(i:i+59,j:j+59),white_on_black_queen)&gt0.90
+            img(i:i+59,j:j+59)= white_on_black_pawn;
+        
+        elseif ssim(img(i:i+59,j:j+59),white_on_white_queen)&gt0.90
+            img(i:i+59,j:j+59)= white_on_white_pawn;
+        end
+            
+    end
+end
+
+end
+            
+                
+        
+            
+            
+        
+                                   
+
+                                   
+
+
+										</pre>
+                     <!-- END CHANGES -->
+                  </div>
+               </div>
+            </div>
+         </div>
+         <div class="sect1">
+            <h2 id="_part_6c">Part 6C (EXTRA CREDIT)</h2>
+            <div class="sectionbody">
+               <div class="paragraph">
+                  <p>Repeat 6A again, but with real images of the screen. (FOR EXTRA CREDIT)</p>
+               </div>
+               <table class="tableblock frame-all grid-all" style=" width:100%; ">
+                  <col style="width:33%;">
+                  <col style="width:33%;">
+                  <col style="width:33%;">
+                  <tbody>
+                  <tr>
+                     <td class="tableblock halign-left valign-top" >
+                        <p class="tableblock"><span class="image">
+                              <img src="input/Part_6/p6_board_1_screen.jpg" alt="input/Part_6/p6_board_1_screen.jpg" width="100%">
+                              </span>
+                        </p>
+                     </td>
+                     <td class="tableblock halign-left valign-top" >
+                        <p class="tableblock"><span class="image">
+                              <img src="input/Part_6/p6_board_2_screen.jpg" alt="input/Part_6/p6_board_2_screen.jpg" width="100%">
+                              </span>
+                        </p>
+                     </td>
+                     <td class="tableblock halign-left valign-top" >
+                        <p class="tableblock"><span class="image">
+                              <img src="input/Part_6/p6_board_3_screen.jpg" alt="input/Part_6/p6_board_3_screen.jpg" width="100%">
+                              </span>
+                        </p>
+                     </td>
+                  </tr>
+                  <tr>
+                     <td class="tableblock halign-left valign-top" >
+                        <p class="tableblock">
+                              <span class="image">
+                                 <!-- MAKE CHANGES HERE: Part 6c image 1 -->
+                                 <img src="output/Part_6c/placeholder.jpg" alt="output/Part_6c/placeholder.jpg" width="100%">
+                                 <!-- END CHANGES -->
+                              </span>
+                        </p>
+                     </td>
+                     <td class="tableblock halign-left valign-top" >
+                        <p class="tableblock">
+                              <span class="image">
+                                 <!-- MAKE CHANGES HERE: Part 6c image 2 -->
+                                 <img src="output/Part_6c/placeholder.jpg" alt="output/Part_6c/placeholder.jpg" width="100%">
+                                 <!-- END CHANGES -->
+                              </span>
+                        </p>
+                     </td>
+                     <td class="tableblock halign-left valign-top" >
+                        <p class="tableblock">
+                              <span class="image">
+                                 <!-- MAKE CHANGES HERE: Part 6c image 3 -->
+                                 <img src="output/Part_6c/placeholder.jpg" alt="output/Part_6c/placeholder.jpg" width="100%">
+                                 <!-- END CHANGES -->
+                              </span>
+                        </p>
+                     </td>
+                  </tr>
+                  </tbody>
+               </table>
+               <div class="listingblock">
+                  <div class="title">Source</div>
+                  <div class="content monospaced">
+                     <!-- MAKE CHANGES HERE: Part 6c code -->
+                     <pre>// Insert your code here
+										</pre>
+                     <!-- END CHANGES -->
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+      <div id="footer">
+         <div id="footer-text">
+            Last updated 2020-01-23
+         </div>
+      </div>
+   </body>
+</html>
